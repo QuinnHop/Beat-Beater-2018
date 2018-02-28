@@ -30,7 +30,8 @@ namespace Game1
 
             base.Initialize();
             // Drew Donovan
-            //Quinn Hopwod
+            // Quinn Hopwod
+            // Gabriel Schugardt
         }
 
         /// <summary>
