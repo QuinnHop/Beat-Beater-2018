@@ -13,8 +13,15 @@ namespace Game1
         //fields
         protected Rectangle position;
         protected Texture2D texture;
+        protected float speed;
 
         //properties
+        public float Speed
+        {
+            get { return speed; }
+            set { speed = value; }
+        }
+
         public int PositionX
         {
             get { return position.X; }
@@ -52,7 +59,7 @@ namespace Game1
         }
         //constructor
 
-        public GameObject(int x, int y, int height, int width)
+        public GameObject(int x, int y, int height, int width, float speed)
         {
             position = new Rectangle(x, y, width, height);
         }

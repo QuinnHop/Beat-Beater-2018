@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Collections.Generic;
 
 namespace Game1
 {
@@ -25,6 +26,11 @@ namespace Game1
         //random
         Random rng;
 
+        //enemy bullets
+        private List<EnemyBullet> enemies;
+        private int spawnDirection;
+        private Texture2D enemyTexture;
+        public float timer;
         //player
         Player player;
         public Texture2D character;
@@ -47,8 +53,9 @@ namespace Game1
             //initialization
             this.IsMouseVisible = true; 
             rng = new Random();
-            player = new Player(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2, 75, 100);
-                
+            player = new Player(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2, 75, 100, 5.0f);
+
+            enemies = new List<EnemyBullet>();
             base.Initialize();
             // Drew Donovan
             // Quinn Hopwod
@@ -66,6 +73,10 @@ namespace Game1
 
             character = Content.Load<Texture2D>("arrow");
             player.Texture = character;
+
+            enemyTexture = Content.Load<Texture2D>("enemybullet");
+            
+
             // TODO: use this.Content to load your game content here
         }
 
@@ -97,23 +108,40 @@ namespace Game1
             //angle calculations
             angle = (float)(Math.Atan2(mouse.Y - player.PositionY, mouse.X - player.PositionX));
 
+            //creates bullets
+            BulletSpawner();
+            timer = gameTime.ElapsedGameTime.Seconds;
+            foreach(EnemyBullet en in enemies)
+            {
+                en.PositionX += (int)(en.Speed * Math.Cos(en.Angle));
+                en.PositionY += (int)(en.Speed * Math.Sin(en.Angle));
+            }
 
+            //checks to remove bullets out of bounds
+            for(int i = 0; i < enemies.Count-1; i++)
+            {
+                if (enemies[i].CheckDelete(enemies[i].PositionX, enemies[i].PositionY))
+                {
+                    enemies.RemoveAt(i);
+                    i--;
+                }
+            }
             //processes player movement
             if (kbState.IsKeyDown(Keys.D) && player.PositionX < GraphicsDevice.Viewport.Width - 100)//moves player left
             {
-                player.PositionX += 5;
+                player.PositionX += (int)player.Speed;
             }
             if (kbState.IsKeyDown(Keys.A) && player.PositionX > 0)//moves player right
             {
-                player.PositionX -= 5;
+                player.PositionX -= (int)player.Speed;
             }
             if (kbState.IsKeyDown(Keys.S) && player.PositionY < GraphicsDevice.Viewport.Height - 75)//moves player down
             {
-                player.PositionY += 5;
+                player.PositionY += (int)player.Speed;
             }
             if (kbState.IsKeyDown(Keys.W) && player.PositionY > 0)//moves player up
             {
-                player.PositionY -= 5;
+                player.PositionY -= (int)player.Speed;
             }
 
             base.Update(gameTime);
@@ -130,6 +158,13 @@ namespace Game1
             // TODO: Add your drawing code here
             spriteBatch.Begin();
 
+            foreach(EnemyBullet en in enemies)
+            {
+                spriteBatch.Draw(en.Texture, en.Position, null, Color.White, 
+                    (float)(en.Angle + Math.PI), new Vector2(en.Width/2, en.Height/2),
+                    SpriteEffects.None, 0);
+            }
+            
             //this is the drawing of the player overloads are as follows:
             //player.Texture: the texture to load
             //player.position: The rectangle it derives it's position from
@@ -145,6 +180,50 @@ namespace Game1
 
             spriteBatch.End();
             base.Draw(gameTime);
+        }
+
+        //bullet spawner
+        public void BulletSpawner()
+        {
+            if(enemies.Count < 10)
+            {
+                //determine area to spawn in
+                spawnDirection = rng.Next(1, 5);
+                
+                if(spawnDirection == 1)//spawns above the screen
+                {
+                    int randomX = rng.Next(10, GraphicsDevice.Viewport.Width);  //spawns above
+                    EnemyBullet enemy = new EnemyBullet(randomX, -100, 20, 20, 6.0f);
+                    enemy.Texture = enemyTexture;
+                    enemy.Angle = enemy.FindAngle(enemy, player);
+                    enemies.Add(enemy);
+                }
+                if(spawnDirection == 2)//spawns to the right of the screen
+                {
+                    int randomY = rng.Next(10, GraphicsDevice.Viewport.Height);//spawns to the right
+                    EnemyBullet enemy = new EnemyBullet(GraphicsDevice.Viewport.Width +100, randomY, 20, 20, 6.0f);
+                    enemy.Texture = enemyTexture;
+                    enemy.Angle = enemy.FindAngle(enemy, player);
+                    enemies.Add(enemy);
+                }
+                if(spawnDirection == 3)//spawns below the screen
+                {
+                    int randomX = rng.Next(10, GraphicsDevice.Viewport.Width);//spawns below
+                    EnemyBullet enemy = new EnemyBullet(randomX, GraphicsDevice.Viewport.Height + 100, 20, 20, 6.0f);
+                    enemy.Texture = enemyTexture;
+                    enemy.Angle = enemy.FindAngle(enemy, player);
+                    enemies.Add(enemy);
+                }
+                if(spawnDirection == 4)//spawns to the left of the screen
+                {
+                    int randomY = rng.Next(10, GraphicsDevice.Viewport.Height);//spawns to the left
+                    EnemyBullet enemy = new EnemyBullet(-100, randomY, 20, 20, 6.0f);
+                    enemy.Texture = enemyTexture;
+                    enemy.Angle = enemy.FindAngle(enemy, player);
+                    enemies.Add(enemy);
+                }
+                
+            }
         }
     }
 }

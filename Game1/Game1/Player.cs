@@ -16,10 +16,10 @@ namespace Game1
         //properties
 
         //constructor
-        public Player(int x, int y, int width, int height)
-            : base(x, y, width, height)
+        public Player(int x, int y, int width, int height, float speed)
+            : base(x, y, width, height, speed)
         {
-
+            this.speed = speed;
         }
 
         //methods
