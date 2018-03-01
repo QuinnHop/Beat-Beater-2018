@@ -17,39 +17,48 @@ namespace Game1
         //properties
         public int PositionX
         {
-            get
-            {
-                return position.X;
-            }
+            get { return position.X; }
 
-            set
-            {
-                position.X = value;
-            }
+            set { position.X = value; }
         }
 
         public int PositionY
         {
-            get
-            {
-                return position.Y;
-            }
+            get { return position.Y; }
 
-            set
-            {
-                position.Y = value;
-            }
+            set { position.Y = value; }
+        }
+        
+        public int Width
+        {
+            get { return position.Width; }
+            set { position.Width = value; }
         }
 
+        public int Height
+        {
+            get { return position.Height; }
+            set { position.Height = value; }
+        }
+
+        public Rectangle Position {
+            get { return position; }
+        }
+
+        public Texture2D Texture
+        {
+            get { return texture; }
+            set { texture = value; }
+        }
         //constructor
 
         public GameObject(int x, int y, int height, int width)
         {
             position = new Rectangle(x, y, width, height);
         }
+        
         //methods
-
-
+        
 
 
     }

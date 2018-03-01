@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Game1
 {
-    class Player 
+    class Player : GameObject
     {
         //fields
 
@@ -16,7 +16,11 @@ namespace Game1
         //properties
 
         //constructor
+        public Player(int x, int y, int width, int height)
+            : base(x, y, width, height)
+        {
 
+        }
 
         //methods
     }
