@@ -22,6 +22,7 @@ namespace Game1
 
         //keyboard States
         private KeyboardState kbState;
+        private KeyboardState prevKbsState;
 
         //random
         Random rng;
@@ -34,6 +35,7 @@ namespace Game1
         //player
         Player player;
         public Texture2D character;
+        private List<PlayerProjectile> pProjects;
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -54,8 +56,9 @@ namespace Game1
             this.IsMouseVisible = true; 
             rng = new Random();
             player = new Player(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2, 75, 100, 5.0f);
-
+            pProjects = new List<PlayerProjectile>();
             enemies = new List<EnemyBullet>();
+            kbState = Keyboard.GetState();
             base.Initialize();
             // Drew Donovan
             // Quinn Hopwod
@@ -100,6 +103,8 @@ namespace Game1
                 Exit();
 
             //update keyboard and mouse states
+            
+            prevKbsState = kbState;
             kbState = Keyboard.GetState();
             mouse = Mouse.GetState();
 
@@ -108,21 +113,58 @@ namespace Game1
             //angle calculations
             angle = (float)(Math.Atan2(mouse.Y - player.PositionY, mouse.X - player.PositionX));
 
+            if (kbState.IsKeyDown(Keys.Space) && prevKbsState.IsKeyUp(Keys.Space))//checks if player pressed space and fires a bullet
+            {
+                PlayerProjectile p = new PlayerProjectile(player.PositionX, player.PositionY, 25, 25, 7.0f);
+                p.Texture = enemyTexture;
+                p.Angle = (float)angle;
+                pProjects.Add(p);
+            }
+
+
             //creates bullets
             BulletSpawner();
             timer = gameTime.ElapsedGameTime.Seconds;
-            foreach(EnemyBullet en in enemies)
+            foreach(EnemyBullet en in enemies)//moves enemy bullets
             {
                 en.PositionX += (int)(en.Speed * Math.Cos(en.Angle));
                 en.PositionY += (int)(en.Speed * Math.Sin(en.Angle));
             }
 
-            //checks to remove bullets out of bounds
-            for(int i = 0; i < enemies.Count-1; i++)
+            foreach (PlayerProjectile p in pProjects)//moves player bullets
             {
-                if (enemies[i].CheckDelete(enemies[i].PositionX, enemies[i].PositionY))
+                p.PositionX += (int)(p.Speed * Math.Cos(p.Angle));
+                p.PositionY += (int)(p.Speed * Math.Sin(p.Angle));
+            }
+            //checks to enemy remove bullets out of bounds
+            for (int i = 0; i < enemies.Count-1; i++)
+            {
+                if (enemies[i].CheckDelete(enemies[i].PositionX, enemies[i].PositionY)
+                    || enemies[i].CheckCollision(enemies[i], player))
                 {
                     enemies.RemoveAt(i);
+                    i--;
+                }
+            }
+
+            //checks playerProjectile collisions with enemyBullets
+            foreach(PlayerProjectile p in pProjects)
+            {
+                for(int i = 0; i < enemies.Count; i++)
+                {
+                    if (p.CheckCollision(p, enemies[i]))
+                    {
+                        enemies.RemoveAt(i);
+                        i--;
+                    }
+                }
+            }
+            //checks to  remove player bullets out of bounds
+            for (int i = 0; i < pProjects.Count - 1; i++)
+            {
+                if (pProjects[i].CheckDelete(pProjects[i].PositionX, pProjects[i].PositionY))
+                {
+                    pProjects.RemoveAt(i);
                     i--;
                 }
             }
@@ -164,7 +206,13 @@ namespace Game1
                     (float)(en.Angle + Math.PI), new Vector2(en.Width/2, en.Height/2),
                     SpriteEffects.None, 0);
             }
-            
+            foreach (PlayerProjectile p in pProjects)
+            {
+                spriteBatch.Draw(p.Texture, p.Position, null, Color.White,
+                    (float)(p.Angle + Math.PI), new Vector2(p.Width / 2, p.Height / 2),
+                    SpriteEffects.None, 0);
+            }
+
             //this is the drawing of the player overloads are as follows:
             //player.Texture: the texture to load
             //player.position: The rectangle it derives it's position from

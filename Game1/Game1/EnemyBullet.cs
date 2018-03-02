@@ -11,8 +11,8 @@ namespace Game1
     class EnemyBullet : GameObject
     {
         //fields
-        private float angle;
-        private bool toBeDeleted;
+        protected float angle;
+        protected bool toBeDeleted;
         //properties
         public float Angle
         {
@@ -48,6 +48,18 @@ namespace Game1
             angleToReturn = (float)Math.Atan2(player.PositionY - bullet.PositionY, player.PositionX - bullet.PositionX);
             angle = angleToReturn;
             return angleToReturn;
+        }
+
+        public bool CheckCollision(GameObject object1, GameObject object2)//checks collision
+        {
+            if (object1.Position.Intersects(object2.Position))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }
