@@ -9,6 +9,14 @@ namespace Game1
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
+    /// 
+    public enum GameState
+    {
+        MainMenu,
+        Paused,
+        InGame,
+        GameOver
+    }
     public class Game1 : Game
     {
         GraphicsDeviceManager graphics;
@@ -63,6 +71,7 @@ namespace Game1
             // Drew Donovan
             // Quinn Hopwod
             // Gabriel Schugardt
+
         }
 
         /// <summary>
