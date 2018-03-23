@@ -135,7 +135,7 @@ namespace Game1
 
             //update keyboard and mouse states
             
-            prevKbsState = kbState;
+            prevKbsState = kbState;//sets previous kb state
             kbState = Keyboard.GetState();
 
             prevMouseState = mouse;
