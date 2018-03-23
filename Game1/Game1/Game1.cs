@@ -24,6 +24,9 @@ namespace Game1
 
         //fields
 
+        //game state
+        private GameState gameState;
+
         //mouse and angle
         private double angle;
         private MouseState mouse;
@@ -39,17 +42,27 @@ namespace Game1
         private List<EnemyBullet> enemies;
         private Texture2D enemyTexture;
         public float timer;
+
         //player
         Player player;
         public Texture2D character;
         private List<PlayerProjectile> pProjects;
+
         FileReader reader;
         string currentFile;
+        //collectables
+        Collectable collectable;
+        private Texture2D collectTexture;
+        private List<Collectable> collectables;
+        private int collectRNG;
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
         }
+
+        //score
+        private int score;
 
         /// <summary>
         /// Allows the game to perform any initialization it needs to before starting to run.
@@ -67,14 +80,17 @@ namespace Game1
             player = new Player(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2, 75, 100, 5.0f);
             pProjects = new List<PlayerProjectile>();
             enemies = new List<EnemyBullet>();
+            collectables = new List<Collectable>();
             kbState = Keyboard.GetState();
             mouse = Mouse.GetState();
             currentFile = "test.txt";
             reader = new FileReader(currentFile);
             reader.ReadLine();
+            gameState = GameState.MainMenu;
+            score = 0;
             base.Initialize();
             // Drew Donovan
-            // Quinn Hopwod
+            // Quinn Hopwood
             // Gabriel Schugardt
             // Fisher Michaels
         }
@@ -92,6 +108,8 @@ namespace Game1
             player.Texture = character;
 
             enemyTexture = Content.Load<Texture2D>("enemybullet");
+
+            collectTexture = Content.Load<Texture2D>("coin");
             
 
             // TODO: use this.Content to load your game content here
@@ -212,6 +230,25 @@ namespace Game1
             {
                 player.PositionY -= (int)player.Speed;
             }
+            //collectable spawn
+            rng = new Random();
+            collectRNG = rng.Next(1000);
+            if(collectRNG == 10)
+            {
+                collectable = new Collectable(rng.Next(GraphicsDevice.Viewport.Width), rng.Next(GraphicsDevice.Viewport.Height), 25, 25, 0);
+                collectable.Texture = collectTexture;
+                collectables.Add(collectable);
+            }
+            //collectable collision
+            for (int i = 0; i < collectables.Count; i++)
+            {
+                if (collectables[i].Position.Intersects(player.Position))
+                {
+                    collectables.RemoveAt(i);
+                    i--;
+                }
+            }
+
 
             //testing filereader
            
@@ -253,6 +290,23 @@ namespace Game1
                 reader.ReadLine();
             }
 
+            //control gameState
+            switch (gameState)
+            {
+                case GameState.MainMenu:
+                    break;
+                case GameState.Paused:
+                    break;
+                case GameState.InGame:
+                    if (player.Health <= 0) //Ends current game if player health is equal to or below 0
+                    {
+                        gameState = GameState.GameOver;
+                    }
+                    break;
+                case GameState.GameOver:
+                    break;
+            }
+
             base.Update(gameTime);
         }
 
@@ -278,6 +332,10 @@ namespace Game1
                 spriteBatch.Draw(p.Texture, p.Position, null, Color.White,
                     (float)(p.Angle + Math.PI), new Vector2(p.Width / 2, p.Height / 2),
                     SpriteEffects.None, 0);
+            }
+            foreach (Collectable c in collectables)
+            {
+                spriteBatch.Draw(c.Texture, c.Position, Color.White);
             }
 
             //this is the drawing of the player overloads are as follows:
