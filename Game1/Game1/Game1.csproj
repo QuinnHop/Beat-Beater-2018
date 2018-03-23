@@ -41,6 +41,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Button.cs" />
     <Compile Include="FileReader.cs" />
     <Compile Include="Collectable.cs" />
     <Compile Include="Game1.cs" />
