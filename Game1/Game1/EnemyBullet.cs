@@ -13,6 +13,7 @@ namespace Game1
         //fields
         protected float angle;
         protected bool toBeDeleted;
+        string attackName;
         //properties
         public float Angle
         {
@@ -25,6 +26,11 @@ namespace Game1
             get { return toBeDeleted; }
             set { toBeDeleted = value; }
         }
+        public string AttackName
+        {
+            get { return attackName; }
+            set { attackName = value; }
+        } 
         //constructor
         public EnemyBullet(int x, int y, int width, int height, float speed) : base(x, y, height, width, speed)
         {
