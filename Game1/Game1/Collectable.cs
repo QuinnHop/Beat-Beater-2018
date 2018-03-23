@@ -6,19 +6,18 @@ using System.Threading.Tasks;
 
 namespace Game1
 {
-    class PlayerProjectile : EnemyBullet
+    class Collectable : GameObject
     {
         //fields
 
         //properties
 
         //constructor
-        public PlayerProjectile(int x, int y, int width, int height, float speed) : base(x, y, width, height, speed)
+        public Collectable(int x, int y, int width, int height, float speed) : base(x, y, height, width, speed)
         {
-
+            speed = 0;
         }
+
         //methods
-
-
     }
 }
