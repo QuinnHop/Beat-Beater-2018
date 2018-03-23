@@ -37,13 +37,14 @@ namespace Game1
 
         //enemy bullets
         private List<EnemyBullet> enemies;
-        private int spawnDirection;
         private Texture2D enemyTexture;
         public float timer;
         //player
         Player player;
         public Texture2D character;
         private List<PlayerProjectile> pProjects;
+        FileReader reader;
+        string currentFile;
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -67,6 +68,9 @@ namespace Game1
             pProjects = new List<PlayerProjectile>();
             enemies = new List<EnemyBullet>();
             kbState = Keyboard.GetState();
+            currentFile = "test.txt";
+            reader = new FileReader(currentFile);
+            reader.ReadLine();
             base.Initialize();
             // Drew Donovan
             // Quinn Hopwod
@@ -132,8 +136,8 @@ namespace Game1
 
 
             //creates bullets
-            BulletSpawner();
-            timer = gameTime.ElapsedGameTime.Seconds;
+            
+            timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
             foreach(EnemyBullet en in enemies)//moves enemy bullets
             {
                 en.PositionX += (int)(en.Speed * Math.Cos(en.Angle));
@@ -153,6 +157,14 @@ namespace Game1
                 {
                     enemies.RemoveAt(i);
                     i--;
+                }
+            }
+
+            foreach(EnemyBullet en in enemies)
+            {
+                if(en.AttackName == "homing")
+                {
+                    en.Angle = (en.FindAngle(en, player));
                 }
             }
 
@@ -193,6 +205,46 @@ namespace Game1
             if (kbState.IsKeyDown(Keys.W) && player.PositionY > 0)//moves player up
             {
                 player.PositionY -= (int)player.Speed;
+            }
+
+            //testing filereader
+           
+            if(timer >= reader.TimeStamp && reader.LevelComplete == false)
+            {
+                Console.WriteLine(reader.TimeStamp + " " + reader.AttackName
+                    + " " + reader.NumberOfAttacks + " " + reader.xPosition + " " + reader.yPosition);
+                if (reader.AttackName == " basic")
+                {
+                    for(int i = 0; i < reader.NumberOfAttacks; i++)
+                    {
+                        EnemyBullet bullet = new EnemyBullet((int)reader.xPosition, (int)reader.yPosition, 25, 25, 6);
+                        Console.WriteLine("Bullet created at: " + bullet.PositionX + ", " + bullet.PositionY);
+                        Console.WriteLine("Current reader time: " + reader.TimeStamp + ". Current Game time: " + timer);
+                        reader.xPosition += rng.Next(25, 100);//spaces bullets out
+                        reader.yPosition += rng.Next(25, 100);
+                        bullet.Texture = enemyTexture;
+                        bullet.Angle = bullet.FindAngle(bullet, player);
+                        bullet.AttackName = "basic";
+                        enemies.Add(bullet);
+                    }
+                }
+                else if (reader.AttackName == " homing")
+                {
+                    EnemyBullet Hbullet = new EnemyBullet((int)reader.xPosition, (int)reader.yPosition, 25, 25, 4);
+                    Console.WriteLine("Bullet created at: " + Hbullet.PositionX + ", " + Hbullet.PositionY);
+                    Console.WriteLine("Current reader time: " + reader.TimeStamp + ". Current Game time: " + timer);
+                    reader.xPosition += rng.Next(25, 100);//spaces bullets out
+                    reader.yPosition += rng.Next(25, 100);
+                    Hbullet.Texture = enemyTexture;
+                    Hbullet.Angle = Hbullet.FindAngle(Hbullet, player);
+                    Hbullet.AttackName = "homing";
+                    enemies.Add(Hbullet);
+                }
+                else
+                {
+                    Console.WriteLine("Invalid bullet name, line will not spawn");
+                }
+                reader.ReadLine();
             }
 
             base.Update(gameTime);
@@ -240,6 +292,7 @@ namespace Game1
         }
 
         //bullet spawner
+        /*
         public void BulletSpawner()
         {
             if(enemies.Count < 10)
@@ -281,6 +334,8 @@ namespace Game1
                 }
                 
             }
-        }
+       
+         }
+         */
     }
 }
