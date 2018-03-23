@@ -83,7 +83,7 @@ namespace Game1
             collectables = new List<Collectable>();
             kbState = Keyboard.GetState();
             mouse = Mouse.GetState();
-            currentFile = "test.txt";
+            currentFile = string.Format("Content/test.txt");
             reader = new FileReader(currentFile);
             reader.ReadLine();
             gameState = GameState.MainMenu;
