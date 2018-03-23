@@ -27,7 +27,7 @@ namespace Game1
         //mouse and angle
         private double angle;
         private MouseState mouse;
-
+        private MouseState prevMouseState;
         //keyboard States
         private KeyboardState kbState;
         private KeyboardState prevKbsState;
@@ -68,6 +68,7 @@ namespace Game1
             pProjects = new List<PlayerProjectile>();
             enemies = new List<EnemyBullet>();
             kbState = Keyboard.GetState();
+            mouse = Mouse.GetState();
             currentFile = "test.txt";
             reader = new FileReader(currentFile);
             reader.ReadLine();
@@ -119,19 +120,24 @@ namespace Game1
             
             prevKbsState = kbState;
             kbState = Keyboard.GetState();
+
+            prevMouseState = mouse;
             mouse = Mouse.GetState();
+            
 
             // TODO: Add your update logic here
 
-            //angle calculations
+            //angle calculations for player
             angle = (float)(Math.Atan2(mouse.Y - player.PositionY, mouse.X - player.PositionX));
 
-            if (kbState.IsKeyDown(Keys.Space) && prevKbsState.IsKeyUp(Keys.Space))//checks if player pressed space and fires a bullet
+
+            if ((mouse.LeftButton == ButtonState.Pressed) && (prevMouseState.LeftButton == ButtonState.Released))//checks if player pressed space and fires a bullet
             {
                 PlayerProjectile p = new PlayerProjectile(player.PositionX, player.PositionY, 25, 25, 7.0f);
                 p.Texture = enemyTexture;
                 p.Angle = (float)angle;
                 pProjects.Add(p);
+                Console.WriteLine("SHOT FIRED");
             }
 
 
@@ -213,7 +219,7 @@ namespace Game1
             {
                 Console.WriteLine(reader.TimeStamp + " " + reader.AttackName
                     + " " + reader.NumberOfAttacks + " " + reader.xPosition + " " + reader.yPosition);
-                if (reader.AttackName == " basic")
+                if (reader.AttackName == " basic")//spawns basic enemy bullets
                 {
                     for(int i = 0; i < reader.NumberOfAttacks; i++)
                     {
@@ -228,7 +234,7 @@ namespace Game1
                         enemies.Add(bullet);
                     }
                 }
-                else if (reader.AttackName == " homing")
+                else if (reader.AttackName == " homing")//spawns homing bullets
                 {
                     EnemyBullet Hbullet = new EnemyBullet((int)reader.xPosition, (int)reader.yPosition, 25, 25, 4);
                     Console.WriteLine("Bullet created at: " + Hbullet.PositionX + ", " + Hbullet.PositionY);
@@ -242,7 +248,7 @@ namespace Game1
                 }
                 else
                 {
-                    Console.WriteLine("Invalid bullet name, line will not spawn");
+                    Console.WriteLine("Invalid bullet name, line will not spawn");//if attackname is recognized
                 }
                 reader.ReadLine();
             }
