@@ -111,7 +111,6 @@ namespace Game1
 
             collectTexture = Content.Load<Texture2D>("coin");
             
-
             // TODO: use this.Content to load your game content here
         }
 
