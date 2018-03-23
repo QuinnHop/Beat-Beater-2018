@@ -24,6 +24,9 @@ namespace Game1
 
         //fields
 
+        //game state
+        private GameState gameState;
+
         //mouse and angle
         private double angle;
         private MouseState mouse;
@@ -40,6 +43,7 @@ namespace Game1
         private int spawnDirection;
         private Texture2D enemyTexture;
         public float timer;
+
         //player
         Player player;
         public Texture2D character;
@@ -67,6 +71,7 @@ namespace Game1
             pProjects = new List<PlayerProjectile>();
             enemies = new List<EnemyBullet>();
             kbState = Keyboard.GetState();
+            gameState = GameState.MainMenu;
             base.Initialize();
             // Drew Donovan
             // Quinn Hopwod
@@ -193,6 +198,23 @@ namespace Game1
             if (kbState.IsKeyDown(Keys.W) && player.PositionY > 0)//moves player up
             {
                 player.PositionY -= (int)player.Speed;
+            }
+
+            //control gameState
+            switch (gameState)
+            {
+                case GameState.MainMenu:
+                    break;
+                case GameState.Paused:
+                    break;
+                case GameState.InGame:
+                    if (player.Health <= 0) //Ends current game if player health is equal to or below 0
+                    {
+                        gameState = GameState.GameOver;
+                    }
+                    break;
+                case GameState.GameOver:
+                    break;
             }
 
             base.Update(gameTime);
