@@ -55,6 +55,9 @@ namespace Game1
             Content.RootDirectory = "Content";
         }
 
+        //score
+        private int score;
+
         /// <summary>
         /// Allows the game to perform any initialization it needs to before starting to run.
         /// This is where it can query for any required services and load any non-graphic
@@ -76,6 +79,7 @@ namespace Game1
             reader = new FileReader(currentFile);
             reader.ReadLine();
             gameState = GameState.MainMenu;
+            score = 0;
             base.Initialize();
             // Drew Donovan
             // Quinn Hopwod
