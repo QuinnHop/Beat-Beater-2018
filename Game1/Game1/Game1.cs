@@ -141,12 +141,8 @@ namespace Game1
             prevMouseState = mouse;
             mouse = Mouse.GetState();
             
-
-            // TODO: Add your update logic here
-
             
-
-            //control gameState
+            //gameState switch
             switch (gameState)
             {
                 case GameState.MainMenu:
@@ -332,6 +328,31 @@ namespace Game1
             // TODO: Add your drawing code here
             spriteBatch.Begin();
 
+            //gameState switch
+            switch (gameState)
+            {
+                case GameState.MainMenu:
+                    DrawMenu(gameTime);
+                    break;
+                case GameState.Paused:
+                    break;
+                case GameState.InGame:
+                    DrawInGame(gameTime);
+                    if (player.Health <= 0) //Ends current game if player health is equal to or below 0
+                    {
+                        gameState = GameState.GameOver;
+                    }
+                    break;
+                case GameState.GameOver:
+                    break;
+            }
+
+            spriteBatch.End();
+            base.Draw(gameTime);
+        }
+
+        protected void DrawInGame(GameTime gameTime)
+        {
             foreach(EnemyBullet en in enemies)
             {
                 spriteBatch.Draw(en.Texture, en.Position, null, Color.White, 
@@ -361,9 +382,11 @@ namespace Game1
             spriteBatch.Draw(player.Texture, player.Position, null, 
                 Color.White, (float)(angle + Math.PI/2), new Vector2(player.Texture.Width/2, 
                 player.Texture.Height/2), SpriteEffects.None, 0);
+        }
 
-            spriteBatch.End();
-            base.Draw(gameTime);
+        protected void DrawMenu(GameTime gameTime)
+        {
+
         }
 
         //bullet spawner
