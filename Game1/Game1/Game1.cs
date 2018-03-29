@@ -86,7 +86,7 @@ namespace Game1
             currentFile = string.Format("Content/test.txt");
             reader = new FileReader(currentFile);
             reader.ReadLine();
-            gameState = GameState.MainMenu;
+            gameState = GameState.InGame;
             score = 0;
             base.Initialize();
             // Drew Donovan
@@ -144,6 +144,37 @@ namespace Game1
 
             // TODO: Add your update logic here
 
+            
+
+            //control gameState
+            switch (gameState)
+            {
+                case GameState.MainMenu:
+                    UpdateMenu(gameTime);
+                    break;
+                case GameState.Paused:
+                    break;
+                case GameState.InGame:
+                    UpdateInGame(gameTime);
+                    if (player.Health <= 0) //Ends current game if player health is equal to or below 0
+                    {
+                        gameState = GameState.GameOver;
+                    }
+                    break;
+                case GameState.GameOver:
+                    break;
+            }
+
+            base.Update(gameTime);
+        }
+
+        protected void UpdateMenu(GameTime gameTime)
+        {
+            //menu logic
+        }
+
+        protected void UpdateInGame(GameTime gameTime)
+        {
             //angle calculations for player
             angle = (float)(Math.Atan2(mouse.Y - player.PositionY, mouse.X - player.PositionX));
 
@@ -288,25 +319,6 @@ namespace Game1
                 }
                 reader.ReadLine();
             }
-
-            //control gameState
-            switch (gameState)
-            {
-                case GameState.MainMenu:
-                    break;
-                case GameState.Paused:
-                    break;
-                case GameState.InGame:
-                    if (player.Health <= 0) //Ends current game if player health is equal to or below 0
-                    {
-                        gameState = GameState.GameOver;
-                    }
-                    break;
-                case GameState.GameOver:
-                    break;
-            }
-
-            base.Update(gameTime);
         }
 
         /// <summary>
