@@ -38,6 +38,9 @@ namespace Game1
         //random
         Random rng;
 
+        //menu buttons
+        private Button menuStart;
+
         //enemy bullets
         private List<EnemyBullet> enemies;
         private Texture2D enemyTexture;
@@ -86,8 +89,9 @@ namespace Game1
             currentFile = string.Format("Content/test.txt");
             reader = new FileReader(currentFile);
             reader.ReadLine();
-            gameState = GameState.InGame;
+            gameState = GameState.MainMenu;
             score = 0;
+            menuStart = new Button(new Rectangle(200, 200, 200, 120));
             base.Initialize();
             // Drew Donovan
             // Quinn Hopwood
@@ -167,6 +171,10 @@ namespace Game1
         protected void UpdateMenu(GameTime gameTime)
         {
             //menu logic
+            if ((mouse.LeftButton == ButtonState.Pressed) && (prevMouseState.LeftButton == ButtonState.Released) && menuStart.rectangle.Contains(mouse.Position))
+            {
+                gameState = GameState.InGame;
+            }
         }
 
         protected void UpdateInGame(GameTime gameTime)
@@ -286,7 +294,7 @@ namespace Game1
                 {
                     for(int i = 0; i < reader.NumberOfAttacks; i++)
                     {
-                        EnemyBullet bullet = new EnemyBullet((int)reader.xPosition, (int)reader.yPosition, 25, 25, 6);
+                        EnemyBullet bullet = new EnemyBullet((int)reader.xPosition, (int)reader.yPosition, 25, 25, 2);
                         Console.WriteLine("Bullet created at: " + bullet.PositionX + ", " + bullet.PositionY);
                         Console.WriteLine("Current reader time: " + reader.TimeStamp + ". Current Game time: " + timer);
                         reader.xPosition += rng.Next(25, 100);//spaces bullets out
@@ -351,6 +359,11 @@ namespace Game1
             base.Draw(gameTime);
         }
 
+        protected void DrawMenu(GameTime gameTime)
+        {
+            spriteBatch.Draw(enemyTexture, menuStart.rectangle, Color.Red);
+        }
+
         protected void DrawInGame(GameTime gameTime)
         {
             foreach(EnemyBullet en in enemies)
@@ -382,11 +395,6 @@ namespace Game1
             spriteBatch.Draw(player.Texture, player.Position, null, 
                 Color.White, (float)(angle + Math.PI/2), new Vector2(player.Texture.Width/2, 
                 player.Texture.Height/2), SpriteEffects.None, 0);
-        }
-
-        protected void DrawMenu(GameTime gameTime)
-        {
-
         }
 
         //bullet spawner

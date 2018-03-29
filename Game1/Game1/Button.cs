@@ -8,15 +8,15 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Game1
 {
-    class Button : GameObject
+    class Button
     {
         //Fields
+        public Rectangle rectangle {get; set; }
         
         //Constructors
-        public Button(int x, int y, int width, int height, float speed) 
-            : base (x, y, height, width, speed)
+        public Button(Rectangle rectangle) 
         {
-            speed = 0;
+            this.rectangle = rectangle;
         }
 
         //Methods
