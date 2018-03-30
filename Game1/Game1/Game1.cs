@@ -64,7 +64,7 @@ namespace Game1
         private List<Collectable> collectables;
         private int collectRNG;
         //score
-        private int score;
+        private int bonusScore;
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -100,7 +100,7 @@ namespace Game1
             reader = new FileReader(currentFile);
             reader.ReadLine();
             gameState = GameState.MainMenu;
-            score = 0;
+            bonusScore = 0;
             menuStart = new Button(new Rectangle(400, 400, 400, 160));
             base.Initialize();
             // Drew Donovan
@@ -293,7 +293,7 @@ namespace Game1
                 if (collectables[i].Position.Intersects(player.Position))
                 {
                     collectables.RemoveAt(i);
-                    score++;
+                    bonusScore += 100;
                     i--;
                 }
             }
@@ -410,7 +410,7 @@ namespace Game1
             spriteBatch.Draw(player.Texture, player.Position, null, 
                 Color.White, (float)(angle + Math.PI/2), new Vector2(player.Texture.Width/2, 
                 player.Texture.Height/2), SpriteEffects.None, 0);
-            spriteBatch.DrawString(spriteFont, "Score: " + score, fontVector, Color.Black);
+            spriteBatch.DrawString(spriteFont, "Score: " + (Math.Round(timer + bonusScore, 0)), fontVector, Color.Black);
         }
 
         //bullet spawner
