@@ -38,6 +38,10 @@ namespace Game1
         //random
         Random rng;
 
+        //font
+        private SpriteFont spriteFont;
+        private Vector2 fontVector = new Vector2(350, 0);
+
         //menu buttons
         private Button menuStart;
         private Texture2D menuStartTexture;
@@ -59,14 +63,13 @@ namespace Game1
         private Texture2D collectTexture;
         private List<Collectable> collectables;
         private int collectRNG;
+        //score
+        private int score;
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
         }
-
-        //score
-        private int score;
 
         /// <summary>
         /// Allows the game to perform any initialization it needs to before starting to run.
@@ -114,6 +117,8 @@ namespace Game1
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            spriteFont = Content.Load<SpriteFont>("FontFile");
 
             character = Content.Load<Texture2D>("arrow");
             player.Texture = character;
@@ -288,6 +293,7 @@ namespace Game1
                 if (collectables[i].Position.Intersects(player.Position))
                 {
                     collectables.RemoveAt(i);
+                    score++;
                     i--;
                 }
             }
@@ -404,6 +410,7 @@ namespace Game1
             spriteBatch.Draw(player.Texture, player.Position, null, 
                 Color.White, (float)(angle + Math.PI/2), new Vector2(player.Texture.Width/2, 
                 player.Texture.Height/2), SpriteEffects.None, 0);
+            spriteBatch.DrawString(spriteFont, "Score: " + score, fontVector, Color.Black);
         }
 
         //bullet spawner
