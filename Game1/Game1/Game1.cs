@@ -38,7 +38,9 @@ namespace Game1
         //random
         Random rng;
 
-        
+        //font
+        private SpriteFont spriteFont;
+        private Vector2 fontVector = new Vector2(350, 0);
 
         //menu buttons
         private Button menuStart;
@@ -61,14 +63,13 @@ namespace Game1
         private Texture2D collectTexture;
         private List<Collectable> collectables;
         private int collectRNG;
+        //score
+        private int bonusScore;
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
         }
-
-        //score
-        private int score;
 
         /// <summary>
         /// Allows the game to perform any initialization it needs to before starting to run.
@@ -99,9 +100,8 @@ namespace Game1
             reader = new FileReader(currentFile);
             reader.ReadLine();
             gameState = GameState.MainMenu;
-            score = 0;
-            
-            menuStart = new Button(new Rectangle(200, 200, 200, 120));
+            bonusScore = 0;
+            menuStart = new Button(new Rectangle(400, 400, 400, 160));
             base.Initialize();
             // Drew Donovan
             // Quinn Hopwood
@@ -117,6 +117,8 @@ namespace Game1
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            spriteFont = Content.Load<SpriteFont>("FontFile");
 
             character = Content.Load<Texture2D>("arrow");
             player.Texture = character;
@@ -291,6 +293,7 @@ namespace Game1
                 if (collectables[i].Position.Intersects(player.Position))
                 {
                     collectables.RemoveAt(i);
+                    bonusScore += 100;
                     i--;
                 }
             }
@@ -411,6 +414,7 @@ namespace Game1
             spriteBatch.Draw(player.Texture, player.Position, null, 
                 Color.White, (float)(angle + Math.PI/2), new Vector2(player.Texture.Width/2, 
                 player.Texture.Height/2), SpriteEffects.None, 0);
+            spriteBatch.DrawString(spriteFont, "Score: " + (Math.Round(timer + bonusScore, 0)), fontVector, Color.Black);
         }
 
         //bullet spawner
