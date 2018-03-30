@@ -38,6 +38,8 @@ namespace Game1
         //random
         Random rng;
 
+        
+
         //menu buttons
         private Button menuStart;
 
@@ -91,6 +93,7 @@ namespace Game1
             reader.ReadLine();
             gameState = GameState.MainMenu;
             score = 0;
+            
             menuStart = new Button(new Rectangle(200, 200, 200, 120));
             base.Initialize();
             // Drew Donovan
@@ -114,7 +117,8 @@ namespace Game1
             enemyTexture = Content.Load<Texture2D>("enemybullet");
 
             collectTexture = Content.Load<Texture2D>("coin");
-            
+
+
             // TODO: use this.Content to load your game content here
         }
 
@@ -317,12 +321,15 @@ namespace Game1
                     Hbullet.AttackName = "homing";
                     enemies.Add(Hbullet);
                 }
+               
                 else
                 {
                     Console.WriteLine("Invalid bullet name, line will not spawn");//if attackname is recognized
                 }
                 reader.ReadLine();
             }
+            
+            
         }
 
         /// <summary>
@@ -331,8 +338,9 @@ namespace Game1
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.ForestGreen);
 
+            
             // TODO: Add your drawing code here
             spriteBatch.Begin();
 
@@ -443,5 +451,6 @@ namespace Game1
        
          }
          */
+        
     }
 }
