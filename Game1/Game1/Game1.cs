@@ -42,6 +42,7 @@ namespace Game1
 
         //menu buttons
         private Button menuStart;
+        private Texture2D menuStartTexture;
 
         //enemy bullets
         private List<EnemyBullet> enemies;
@@ -80,6 +81,12 @@ namespace Game1
             // TODO: Add your initialization logic here
 
             //initialization
+
+            //window size
+            graphics.PreferredBackBufferWidth = 800;
+            graphics.PreferredBackBufferHeight = 800;
+            graphics.ApplyChanges();
+
             this.IsMouseVisible = true; 
             rng = new Random();
             player = new Player(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2, 75, 100, 5.0f);
@@ -118,7 +125,8 @@ namespace Game1
 
             collectTexture = Content.Load<Texture2D>("coin");
 
-
+            menuStartTexture = Content.Load<Texture2D>("menuStart");
+            
             // TODO: use this.Content to load your game content here
         }
 
@@ -298,7 +306,7 @@ namespace Game1
                 {
                     for(int i = 0; i < reader.NumberOfAttacks; i++)
                     {
-                        EnemyBullet bullet = new EnemyBullet((int)reader.xPosition, (int)reader.yPosition, 25, 25, 2);
+                        EnemyBullet bullet = new EnemyBullet((int)reader.xPosition, (int)reader.yPosition, 25, 25, 6);
                         Console.WriteLine("Bullet created at: " + bullet.PositionX + ", " + bullet.PositionY);
                         Console.WriteLine("Current reader time: " + reader.TimeStamp + ". Current Game time: " + timer);
                         reader.xPosition += rng.Next(25, 100);//spaces bullets out
@@ -369,7 +377,7 @@ namespace Game1
 
         protected void DrawMenu(GameTime gameTime)
         {
-            spriteBatch.Draw(enemyTexture, menuStart.rectangle, Color.Red);
+            spriteBatch.Draw(menuStartTexture, menuStart.rectangle, Color.White);
         }
 
         protected void DrawInGame(GameTime gameTime)
