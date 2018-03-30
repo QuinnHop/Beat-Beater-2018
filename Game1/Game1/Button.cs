@@ -11,7 +11,7 @@ namespace Game1
     class Button
     {
         //Fields
-        public Rectangle rectangle {get; set; }
+        public Rectangle rectangle { get; set; }
         
         //Constructors
         public Button(Rectangle rectangle) 
