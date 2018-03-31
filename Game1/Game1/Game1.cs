@@ -14,7 +14,9 @@ namespace Game1
     {
         MainMenu,
         Paused,
+        LevelSelect,
         InGame,
+        LevelComplete,
         GameOver
     }
     public class Game1 : Game
@@ -168,12 +170,16 @@ namespace Game1
                     break;
                 case GameState.Paused:
                     break;
+                case GameState.LevelSelect:
+                    break;
                 case GameState.InGame:
                     UpdateInGame(gameTime);
                     if (player.Health <= 0) //Ends current game if player health is equal to or below 0
                     {
                         gameState = GameState.GameOver;
                     }
+                    break;
+                case GameState.LevelComplete:
                     break;
                 case GameState.GameOver:
                     break;
