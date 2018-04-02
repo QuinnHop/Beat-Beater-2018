@@ -255,6 +255,7 @@ namespace Game1
                     {
                         enemies.RemoveAt(i);
                         i--;
+                        player.Health--;
                     }
                 }
             }
