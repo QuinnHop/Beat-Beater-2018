@@ -67,6 +67,13 @@ namespace Game1
         private int collectRNG;
         //score
         private int bonusScore;
+        //powerups
+        PowerUps powerUp;
+        private Texture2D powerUpTexture;
+        private List<PowerUps> powerUps;
+        private int powerRNG;
+        private string altfire;
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -96,6 +103,7 @@ namespace Game1
             pProjects = new List<PlayerProjectile>();
             enemies = new List<EnemyBullet>();
             collectables = new List<Collectable>();
+            powerUps = new List<PowerUps>();
             kbState = Keyboard.GetState();
             mouse = Mouse.GetState();
             currentFile = string.Format("Content/test.txt");
@@ -205,11 +213,37 @@ namespace Game1
 
             if ((mouse.LeftButton == ButtonState.Pressed) && (prevMouseState.LeftButton == ButtonState.Released))//checks if player pressed space and fires a bullet
             {
-                PlayerProjectile p = new PlayerProjectile(player.PositionX, player.PositionY, 25, 25, 7.0f);
-                p.Texture = enemyTexture;
-                p.Angle = (float)angle;
-                pProjects.Add(p);
-                Console.WriteLine("SHOT FIRED");
+                if (altfire == "spread")
+                {
+                    PlayerProjectile p = new PlayerProjectile(player.PositionX, player.PositionY, 25, 25, 7.0f);
+                    p.Texture = enemyTexture;
+                    p.Angle = (float)angle + 1;
+                    pProjects.Add(p);
+                    p = new PlayerProjectile(player.PositionX, player.PositionY, 25, 25, 7.0f);
+                    p.Texture = enemyTexture;
+                    p.Angle = (float)angle - 1;
+                    pProjects.Add(p);
+                    p = new PlayerProjectile(player.PositionX, player.PositionY, 25, 25, 7.0f);
+                    pProjects.Add(p); p.Texture = enemyTexture;
+                    p.Angle = (float)angle;
+                    pProjects.Add(p);
+                    Console.WriteLine("SHOT FIRED");
+                }
+                else if (altfire == "big")
+                {
+                    PlayerProjectile p = new PlayerProjectile(player.PositionX, player.PositionY, 50, 50, 7.0f);
+                    p.Texture = enemyTexture;
+                    p.Angle = (float)angle;
+                    pProjects.Add(p);
+                }
+                else
+                {
+                    PlayerProjectile p = new PlayerProjectile(player.PositionX, player.PositionY, 25, 25, 7.0f);
+                    p.Texture = enemyTexture;
+                    p.Angle = (float)angle;
+                    pProjects.Add(p);
+                    Console.WriteLine("SHOT FIRED");
+                }
             }
 
 
@@ -304,11 +338,93 @@ namespace Game1
                     i--;
                 }
             }
+            //powerup spawn
+            rng = new Random();
+            powerRNG = rng.Next(1000);
+            if(powerRNG == 10)
+            {
+                powerRNG = rng.Next(4);
+                //shield
+                if(powerRNG == 0)
+                {
+                    powerUp = new PowerUps(rng.Next(GraphicsDevice.Viewport.Width), rng.Next(GraphicsDevice.Viewport.Height), 25, 25, 0, "shield");
+                    powerUp.Texture = collectTexture;//shield texture
+                    powerUps.Add(powerUp);
+                }
+                //heal
+                else if (powerRNG == 1)
+                {
+                    powerUp = new PowerUps(rng.Next(GraphicsDevice.Viewport.Width), rng.Next(GraphicsDevice.Viewport.Height), 25, 25, 0, "heal");
+                    powerUp.Texture = collectTexture;//heal texture
+                    powerUps.Add(powerUp);
+                }
+                //speedup
+                else if (powerRNG == 2)
+                {
+                    powerUp = new PowerUps(rng.Next(GraphicsDevice.Viewport.Width), rng.Next(GraphicsDevice.Viewport.Height), 25, 25, 0, "speedup");
+                    powerUp.Texture = collectTexture;//speedUp texture
+                    powerUps.Add(powerUp);
+                }
+                //altfirespread
+                else if (powerRNG == 3)
+                {
+                    powerUp = new PowerUps(rng.Next(GraphicsDevice.Viewport.Width), rng.Next(GraphicsDevice.Viewport.Height), 25, 25, 0, "altfirespread");
+                    powerUp.Texture = collectTexture;//altfirespread texture
+                    powerUps.Add(powerUp);
+                }
+                //altfirebig
+                else
+                {
+                    powerUp = new PowerUps(rng.Next(GraphicsDevice.Viewport.Width), rng.Next(GraphicsDevice.Viewport.Height), 25, 25, 0, "altfirebig");
+                    powerUp.Texture = collectTexture;//altfirebig texture
+                    powerUps.Add(powerUp);
+                }
+            }
 
+            //powerUp collision
+            for (int i = 0; i < powerUps.Count; i++)
+            {
+                if (powerUps[i].Position.Intersects(player.Position))
+                {
+                    if (powerUps[i].Type == "shield")
+                    {
+                        //do what it needs to do
+                        collectables.RemoveAt(i);
+                        i--;
+                    }
+                    else if (powerUps[i].Type == "heal")
+                    {
+                        player.Health++;
+                        collectables.RemoveAt(i);
+                        i--;
+                    }
+                    else if (powerUps[i].Type == "speedup")
+                    {
+                        if (player.Speed == 5f)
+                        {
+                            player.Speed = 10f;
+                        }
+                        collectables.RemoveAt(i);
+                        i--;
+                    }
+                    else if (powerUps[i].Type == "altfirespread")
+                    {
+                        altfire = "spread";
+                        collectables.RemoveAt(i);
+                        i--;
+                    }
+                    else if (powerUps[i].Type == "altfirebig")
+                    {
+                        altfire = "big";
+                        collectables.RemoveAt(i);
+                        i--;
+                    }
+                }
+            }
 
             //testing filereader
-           
-            if(timer >= reader.TimeStamp && reader.LevelComplete == false)
+
+            if (timer >= reader.TimeStamp && reader.LevelComplete == false)
             {
                 Console.WriteLine(reader.TimeStamp + " " + reader.AttackName
                     + " " + reader.NumberOfAttacks + " " + reader.xPosition + " " + reader.yPosition);

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Game1
 {
-    class Collectable : GameObject
+    class Collectable : PickUps
     {
         //fields
 
@@ -17,8 +17,6 @@ namespace Game1
         {
             speed = 0;
         }
-
         //methods
-        //12345
     }
 }
