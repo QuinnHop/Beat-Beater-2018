@@ -18,6 +18,7 @@ namespace Game1
         public PowerUps(int x, int y, int width, int height, float speed, string type) : base(x, y, height, width, speed)
         {
             speed = 0;
+            this.type = type;
         }
         //methods
 

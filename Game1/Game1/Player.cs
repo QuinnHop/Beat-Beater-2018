@@ -25,7 +25,7 @@ namespace Game1
             : base(x, y, width, height, speed)
         {
             this.speed = speed;
-            health = 3; //Health initialized in constructor. Default value is 1, change if you want to
+            health = 1000; //Health initialized in constructor. Default value is 1, change if you want to
         }
 
         //methods
