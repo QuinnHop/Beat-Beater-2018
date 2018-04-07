@@ -13,6 +13,7 @@ namespace Game1
     public enum GameState
     {
         MainMenu,
+        Credits,
         Paused,
         LevelSelect,
         InGame,
@@ -45,21 +46,53 @@ namespace Game1
         private Vector2 fontVector = new Vector2(350, 0);
 
         //menu buttons
+        //main menu
+        private Texture2D menuTexture;
         private Button menuStart;
         private Texture2D menuStartTexture;
+        private Button menuQuit;
+        private Texture2D menuQuitTexture;
+        private Button menuCredits;
+        private Texture2D menuCreditsTexture;
 
+        //level select
+        private Texture2D levelSelectTexture;
+        private Texture2D level1Texture;
+        private Button level1Button;
+        private Texture2D level2Texture;
+        private Button level2Button;
+        private Texture2D level3Texture;
+        private Button level3Button;
+        private Texture2D level4Texture;
+        private Button level4Button;
+
+        //credits
+        private Button back;
+        private Texture2D backTexture;
         //enemy bullets
         private List<EnemyBullet> enemies;
         private Texture2D enemyTexture;
         public float timer;
 
+        //game over
+        private Texture2D levelLost;
+        private Texture2D returnToMenu;
+        private Texture2D retry;
+        private Button returnToMenuButton;
+        private Button retryButton;
         //player
         Player player;
         public Texture2D character;
         private List<PlayerProjectile> pProjects;
 
+        //level information
         FileReader reader;
-        string currentFile;
+        string level1;
+        string level2;
+        string level3;
+        string level4;
+        string level5;
+
         //collectables
         Collectable collectable;
         private Texture2D collectTexture;
@@ -110,12 +143,30 @@ namespace Game1
             powerUps = new List<PowerUps>();
             kbState = Keyboard.GetState();
             mouse = Mouse.GetState();
-            currentFile = string.Format("Content/test.txt");
-            reader = new FileReader(currentFile);
-            reader.ReadLine();
+            level1 = string.Format("Content/test.txt");
+            
             gameState = GameState.MainMenu;
             bonusScore = 0;
-            menuStart = new Button(new Rectangle(400, 400, 400, 160));
+            
+            
+            //menu buttons
+            menuStart = new Button(new Rectangle(186, 400, 426, 68));
+            menuCredits = new Button(new Rectangle(186, 538, 426, 68));
+            menuQuit = new Button(new Rectangle(186, 676, 426, 68));
+
+            //level select
+            level1Button = new Button(new Rectangle(0, 112, 509, 66));
+            level2Button = new Button(new Rectangle(0, 238, 509, 66));
+            level3Button = new Button(new Rectangle(0, 353, 509, 66));
+            level4Button = new Button(new Rectangle(0, 479, 509, 66));
+            
+            //credits button
+            back = new Button(new Rectangle(575, 710, 225, 100));
+
+            //Game over - level lost
+            retryButton = new Button(new Rectangle(71, 570, 263, 134));
+            returnToMenuButton = new Button(new Rectangle(464, 570, 263, 134));
+
             base.Initialize();
             // Drew Donovan
             // Quinn Hopwood
@@ -146,8 +197,23 @@ namespace Game1
             spreadTexture = Content.Load<Texture2D>("spreadshot");//placements
             bigShotTexture = Content.Load<Texture2D>("bigshot");//placements
 
-            menuStartTexture = Content.Load<Texture2D>("menuStart");
-            
+            //main menu
+            menuTexture = Content.Load<Texture2D>("MainMenu");
+            menuStartTexture = Content.Load<Texture2D>("PLAY");
+            menuCreditsTexture = Content.Load<Texture2D>("CREDITS");
+            menuQuitTexture = Content.Load<Texture2D>("QUIT");
+            //level select
+            levelSelectTexture = Content.Load<Texture2D>("level selec bright version");
+            level1Texture = Content.Load<Texture2D>("SONG 1");
+            level2Texture = Content.Load<Texture2D>("SONG 2");
+            level3Texture = Content.Load<Texture2D>("SONG 3");
+            level4Texture = Content.Load<Texture2D>("SONG 4");
+            //credits/level select
+            backTexture = Content.Load<Texture2D>("back button");
+            //game over - level lost
+            levelLost = Content.Load<Texture2D>("GameOverScreen");
+            retry = Content.Load<Texture2D>("RETRY");
+            returnToMenu = Content.Load<Texture2D>("MENU");
             // TODO: use this.Content to load your game content here
         }
 
@@ -185,9 +251,13 @@ namespace Game1
                 case GameState.MainMenu:
                     UpdateMenu(gameTime);
                     break;
+                case GameState.Credits:
+                    UpdateCredits(gameTime);
+                    break;
                 case GameState.Paused:
                     break;
                 case GameState.LevelSelect:
+                    UpdateLevelSelect(gameTime);
                     break;
                 case GameState.InGame:
                     UpdateInGame(gameTime);
@@ -197,8 +267,11 @@ namespace Game1
                     }
                     break;
                 case GameState.LevelComplete:
+                    player.Health = 10;
                     break;
                 case GameState.GameOver:
+                    UpdateGameOver(gameTime);
+                    player.Health = 10;
                     break;
             }
 
@@ -208,12 +281,74 @@ namespace Game1
         protected void UpdateMenu(GameTime gameTime)
         {
             //menu logic
-            if ((mouse.LeftButton == ButtonState.Pressed) && (prevMouseState.LeftButton == ButtonState.Released) && menuStart.rectangle.Contains(mouse.Position))
+            //updates player model in menu
+            angle = (float)(Math.Atan2(mouse.Y - player.PositionY, mouse.X - player.PositionX));
+
+            //changes menu screens
+            
+            if(menuStart.checkPressed(mouse))
+            {
+                gameState = GameState.LevelSelect;
+            }
+            if (menuCredits.checkPressed(mouse))
+            {
+                gameState = GameState.Credits;
+            }
+            if (menuQuit.checkPressed(mouse))
+            {
+                Exit();
+            }
+        }
+        protected void UpdateLevelSelect(GameTime gameTime)
+        {
+            //currently only level one has any data, so trying to play any of the others will crash the program
+            if (level1Button.checkPressed(mouse))
+            {
+                reader = new FileReader(level1);
+                reader.ReadLine();
+                gameState = GameState.InGame;
+            }
+            else if (level2Button.checkPressed(mouse))
+            {
+                reader = new FileReader(level2);
+                reader.ReadLine();
+                gameState = GameState.InGame;
+            }
+            else if (level3Button.checkPressed(mouse))
+            {
+                reader = new FileReader(level3);
+                reader.ReadLine();
+                gameState = GameState.InGame;
+            }
+            else if (level4Button.checkPressed(mouse))
+            {
+                reader = new FileReader(level4);
+                reader.ReadLine();
+                gameState = GameState.InGame;
+            }
+            else if (back.checkPressed(mouse))
+            {
+                gameState = GameState.MainMenu;
+            }
+        }
+        protected void UpdateCredits(GameTime gameTime)
+        {
+            if (back.checkPressed( mouse))
+            {
+                gameState = GameState.MainMenu;
+            }
+        }
+        protected void UpdateGameOver(GameTime gameTime)
+        {
+            if (returnToMenuButton.checkPressed(mouse))
+            {
+                gameState = GameState.MainMenu;
+            }
+            else if (retryButton.checkPressed(mouse))
             {
                 gameState = GameState.InGame;
             }
         }
-
         protected void UpdateInGame(GameTime gameTime)
         {
             //angle calculations for player
@@ -273,11 +408,20 @@ namespace Game1
             //checks to enemy remove bullets out of bounds
             for (int i = 0; i < enemies.Count-1; i++)
             {
-                if (enemies[i].CheckDelete(enemies[i].PositionX, enemies[i].PositionY)
-                    || enemies[i].CheckCollision(enemies[i], player))
+                if (enemies[i].CheckDelete(enemies[i].PositionX, enemies[i].PositionY))
                 {
                     enemies.RemoveAt(i);
                     i--;
+                }
+            }
+            //removes and damages player when enemy collides with it
+            for (int i = 0; i < enemies.Count-1; i++)
+            {
+                if (enemies[i].CheckCollision(enemies[i], player))
+                {
+                    enemies.RemoveAt(i);
+                    i--;
+                    player.Health--;
                 }
             }
 
@@ -298,7 +442,7 @@ namespace Game1
                     {
                         enemies.RemoveAt(i);
                         i--;
-                        player.Health--;
+                        
                     }
                 }
             }
@@ -498,6 +642,12 @@ namespace Game1
                 case GameState.MainMenu:
                     DrawMenu(gameTime);
                     break;
+                case GameState.Credits:
+                    DrawCredits(gameTime);
+                    break;
+                case GameState.LevelSelect:
+                    DrawLevelSelect(gameTime);
+                    break;
                 case GameState.Paused:
                     break;
                 case GameState.InGame:
@@ -508,6 +658,7 @@ namespace Game1
                     }
                     break;
                 case GameState.GameOver:
+                    DrawGameOver(gameTime);
                     break;
             }
 
@@ -517,11 +668,107 @@ namespace Game1
 
         protected void DrawMenu(GameTime gameTime)
         {
-            spriteBatch.Draw(menuStartTexture, menuStart.rectangle, Color.White);
-        }
+            spriteBatch.Draw(menuTexture, new Rectangle(0, 0, 800, 800), Color.White);
+            player.PositionY = 250;
+            spriteBatch.Draw(player.Texture, (player.Position), null,
+                Color.White, (float)(angle + Math.PI / 2), new Vector2(player.Texture.Width / 2,
+                player.Texture.Height / 2), SpriteEffects.None, 0);
 
+            if (menuStart.checkHover(mouse))//checks if mouse is over start button
+            {
+                spriteBatch.Draw(menuStartTexture, menuStart.rectangle, Color.Green);
+            }
+            else
+            {
+                spriteBatch.Draw(menuStartTexture, menuStart.rectangle, Color.White);
+            }
+
+            if (menuCredits.checkHover(mouse))//checks if mouse is over credits button
+            {
+                spriteBatch.Draw(menuCreditsTexture, menuCredits.rectangle, Color.SkyBlue);
+            }
+            else
+            {
+                spriteBatch.Draw(menuCreditsTexture, menuCredits.rectangle, Color.White);
+            }
+
+            if (menuQuit.checkHover(mouse))//checks if mouse is over the quit button
+            {
+                spriteBatch.Draw(menuQuitTexture, menuQuit.rectangle, Color.Crimson);
+            }
+            else
+            {
+                spriteBatch.Draw(menuQuitTexture, menuQuit.rectangle, Color.White);
+            }
+        }
+        protected void DrawLevelSelect(GameTime gameTime)
+        {
+            spriteBatch.Draw(levelSelectTexture, new Rectangle(0, 0, 800, 800), Color.White);
+
+            if (level1Button.checkHover(mouse))//checks if mouse is over start button
+            {
+                spriteBatch.Draw(level1Texture, level1Button.rectangle, Color.Teal);
+                
+            }
+            else
+            {
+                spriteBatch.Draw(level1Texture, level1Button.rectangle, Color.White);
+            }
+            if (level2Button.checkHover(mouse))//checks if mouse is over start button
+            {
+                spriteBatch.Draw(level2Texture, level2Button.rectangle, Color.Green);
+            }
+            else
+            {
+                spriteBatch.Draw(level2Texture, level2Button.rectangle, Color.White);
+            }
+            if (level3Button.checkHover(mouse))//checks if mouse is over start button
+            {
+                spriteBatch.Draw(level3Texture, level3Button.rectangle, Color.Yellow);
+            }
+            else
+            {
+                spriteBatch.Draw(level3Texture, level3Button.rectangle, Color.White);
+            }
+            if (level4Button.checkHover(mouse))//checks if mouse is over start button
+            {
+                spriteBatch.Draw(level4Texture, level4Button.rectangle, Color.Crimson);
+            }
+            else
+            {
+                spriteBatch.Draw(level4Texture, level4Button.rectangle, Color.White);
+            }
+            spriteBatch.Draw(backTexture, back.rectangle, Color.White);
+        }
+        protected void DrawCredits(GameTime gameTime)
+        {
+            GraphicsDevice.Clear(Color.AliceBlue);
+            spriteBatch.Draw(backTexture, back.rectangle, Color.White);
+        }
+        protected void DrawGameOver(GameTime gameTime)
+        {
+            spriteBatch.Draw(levelLost, new Rectangle(0, 0, 800, 800), Color.White);
+            if (retryButton.checkHover(mouse))//checks if mouse is over start button
+            {
+                spriteBatch.Draw(retry, retryButton.rectangle, Color.Green);
+            }
+            else
+            {
+                spriteBatch.Draw(retry, retryButton.rectangle, Color.White);
+            }
+            if (returnToMenuButton.checkHover(mouse))//checks if mouse is over start button
+            {
+                spriteBatch.Draw(returnToMenu, returnToMenuButton.rectangle, Color.Teal);
+            }
+            else
+            {
+                spriteBatch.Draw(returnToMenu, returnToMenuButton.rectangle, Color.White);
+            }
+            
+        }
         protected void DrawInGame(GameTime gameTime)
         {
+            spriteBatch.DrawString(spriteFont, player.Health.ToString(), new Vector2(200, 20), Color.Black);
             foreach(EnemyBullet en in enemies)
             {
                 spriteBatch.Draw(en.Texture, en.Position, null, Color.White, 
@@ -557,7 +804,7 @@ namespace Game1
                 player.Texture.Height/2), SpriteEffects.None, 0);
             spriteBatch.DrawString(spriteFont, "Score: " + (Math.Round(timer + bonusScore, 0)), fontVector, Color.Black);
         }
-
+        
         //bullet spawner
         /*
         public void BulletSpawner()
