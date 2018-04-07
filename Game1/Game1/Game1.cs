@@ -14,7 +14,9 @@ namespace Game1
     {
         MainMenu,
         Paused,
+        LevelSelect,
         InGame,
+        LevelComplete,
         GameOver
     }
     public class Game1 : Game
@@ -65,6 +67,17 @@ namespace Game1
         private int collectRNG;
         //score
         private int bonusScore;
+        //powerups
+        PowerUps powerUp;
+        private Texture2D shieldTexture;
+        private Texture2D healTexture;
+        private Texture2D speedTexture;
+        private Texture2D spreadTexture;
+        private Texture2D bigShotTexture;
+        private List<PowerUps> powerUps;
+        private int powerRNG;
+        private string altfire;
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -94,6 +107,7 @@ namespace Game1
             pProjects = new List<PlayerProjectile>();
             enemies = new List<EnemyBullet>();
             collectables = new List<Collectable>();
+            powerUps = new List<PowerUps>();
             kbState = Keyboard.GetState();
             mouse = Mouse.GetState();
             currentFile = string.Format("Content/test.txt");
@@ -126,6 +140,11 @@ namespace Game1
             enemyTexture = Content.Load<Texture2D>("enemybullet");
 
             collectTexture = Content.Load<Texture2D>("coin");
+            shieldTexture = Content.Load<Texture2D>("shield");//placements
+            healTexture = Content.Load<Texture2D>("health");//placements
+            speedTexture = Content.Load<Texture2D>("speed");//placements
+            spreadTexture = Content.Load<Texture2D>("spreadshot");//placements
+            bigShotTexture = Content.Load<Texture2D>("bigshot");//placements
 
             menuStartTexture = Content.Load<Texture2D>("menuStart");
             
@@ -168,12 +187,16 @@ namespace Game1
                     break;
                 case GameState.Paused:
                     break;
+                case GameState.LevelSelect:
+                    break;
                 case GameState.InGame:
                     UpdateInGame(gameTime);
                     if (player.Health <= 0) //Ends current game if player health is equal to or below 0
                     {
                         gameState = GameState.GameOver;
                     }
+                    break;
+                case GameState.LevelComplete:
                     break;
                 case GameState.GameOver:
                     break;
@@ -199,11 +222,37 @@ namespace Game1
 
             if ((mouse.LeftButton == ButtonState.Pressed) && (prevMouseState.LeftButton == ButtonState.Released))//checks if player pressed space and fires a bullet
             {
-                PlayerProjectile p = new PlayerProjectile(player.PositionX, player.PositionY, 25, 25, 7.0f);
-                p.Texture = enemyTexture;
-                p.Angle = (float)angle;
-                pProjects.Add(p);
-                Console.WriteLine("SHOT FIRED");
+                if (altfire == "spread")
+                {
+                    PlayerProjectile p = new PlayerProjectile(player.PositionX, player.PositionY, 25, 25, 7.0f);
+                    p.Texture = enemyTexture;
+                    p.Angle = (float)angle + 1;
+                    pProjects.Add(p);
+                    p = new PlayerProjectile(player.PositionX, player.PositionY, 25, 25, 7.0f);
+                    p.Texture = enemyTexture;
+                    p.Angle = (float)angle - 1;
+                    pProjects.Add(p);
+                    p = new PlayerProjectile(player.PositionX, player.PositionY, 25, 25, 7.0f);
+                    pProjects.Add(p); p.Texture = enemyTexture;
+                    p.Angle = (float)angle;
+                    pProjects.Add(p);
+                    Console.WriteLine("SHOT FIRED");
+                }
+                else if (altfire == "big")
+                {
+                    PlayerProjectile p = new PlayerProjectile(player.PositionX, player.PositionY, 50, 50, 7.0f);
+                    p.Texture = enemyTexture;
+                    p.Angle = (float)angle;
+                    pProjects.Add(p);
+                }
+                else
+                {
+                    PlayerProjectile p = new PlayerProjectile(player.PositionX, player.PositionY, 25, 25, 7.0f);
+                    p.Texture = enemyTexture;
+                    p.Angle = (float)angle;
+                    pProjects.Add(p);
+                    Console.WriteLine("SHOT FIRED");
+                }
             }
 
 
@@ -249,6 +298,7 @@ namespace Game1
                     {
                         enemies.RemoveAt(i);
                         i--;
+                        player.Health--;
                     }
                 }
             }
@@ -297,11 +347,98 @@ namespace Game1
                     i--;
                 }
             }
+            //powerup spawn
+            rng = new Random();
+            powerRNG = rng.Next(100);
+            if(powerRNG == 10)
+            {
+                powerRNG = rng.Next(5);
+                //shield
+                if(powerRNG == 0)
+                {
+                    powerUp = new PowerUps(rng.Next(GraphicsDevice.Viewport.Width), rng.Next(GraphicsDevice.Viewport.Height), 25, 25, 0, "shield");
+                    powerUp.Texture = shieldTexture;
+                    powerUps.Add(powerUp);
+                }
+                //heal
+                else if (powerRNG == 1)
+                {
+                    powerUp = new PowerUps(rng.Next(GraphicsDevice.Viewport.Width), rng.Next(GraphicsDevice.Viewport.Height), 25, 25, 0, "heal");
+                    powerUp.Texture = healTexture;
+                    powerUps.Add(powerUp);
+                }
+                //speedup
+                else if (powerRNG == 2)
+                {
+                    powerUp = new PowerUps(rng.Next(GraphicsDevice.Viewport.Width), rng.Next(GraphicsDevice.Viewport.Height), 25, 25, 0, "speedup");
+                    powerUp.Texture = speedTexture;
+                    powerUps.Add(powerUp);
+                }
+                //altfirespread
+                else if (powerRNG == 3)
+                {
+                    powerUp = new PowerUps(rng.Next(GraphicsDevice.Viewport.Width), rng.Next(GraphicsDevice.Viewport.Height), 25, 25, 0, "altfirespread");
+                    powerUp.Texture = spreadTexture;
+                    powerUps.Add(powerUp);
+                }
+                //altfirebig
+                else
+                {
+                    powerUp = new PowerUps(rng.Next(GraphicsDevice.Viewport.Width), rng.Next(GraphicsDevice.Viewport.Height), 25, 25, 0, "altfirebig");
+                    powerUp.Texture = bigShotTexture;
+                    powerUps.Add(powerUp);
+                }
+            }
 
+            //powerUp collision
+            for (int i = 0; i < powerUps.Count; i++)
+            {
+                if (powerUps[i].Position.Intersects(player.Position))
+                {
+                    if (powerUps[i].Type == "shield")
+                    {
+                        //do what it needs to do
+                        powerUps.RemoveAt(i);
+                        Console.WriteLine("PICKED UP SHIELD");
+                        i--;
+                    }
+                    else if (powerUps[i].Type == "heal")
+                    {
+                        player.Health++;
+                        powerUps.RemoveAt(i);
+                        Console.WriteLine("PICKED UP HEAL");
+                        i--;
+                    }
+                    else if (powerUps[i].Type == "speedup")
+                    {
+                        if (player.Speed == 5f)
+                        {
+                            player.Speed = 10f;
+                        }
+                        powerUps.RemoveAt(i);
+                        Console.WriteLine("PICKED UP SPEED");
+                        i--;
+                    }
+                    else if (powerUps[i].Type == "altfirespread")
+                    {
+                        altfire = "spread";
+                        powerUps.RemoveAt(i);
+                        Console.WriteLine("PICKED UP SPREAD SHOT");
+                        i--;
+                    }
+                    else if (powerUps[i].Type == "altfirebig")
+                    {
+                        altfire = "big";
+                        powerUps.RemoveAt(i);
+                        Console.WriteLine("PICKED UP BIG SHOT");
+                        i--;
+                    }
+                }
+            }
 
             //testing filereader
-           
-            if(timer >= reader.TimeStamp && reader.LevelComplete == false)
+
+            if (timer >= reader.TimeStamp && reader.LevelComplete == false)
             {
                 Console.WriteLine(reader.TimeStamp + " " + reader.AttackName
                     + " " + reader.NumberOfAttacks + " " + reader.xPosition + " " + reader.yPosition);
@@ -400,6 +537,10 @@ namespace Game1
             foreach (Collectable c in collectables)
             {
                 spriteBatch.Draw(c.Texture, c.Position, Color.White);
+            }
+            foreach (PowerUps p in powerUps)
+            {
+                spriteBatch.Draw(p.Texture, p.Position, Color.White);
             }
 
             //this is the drawing of the player overloads are as follows:
