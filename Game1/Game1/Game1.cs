@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
 using System;
 using System.Collections.Generic;
 
@@ -111,6 +113,14 @@ namespace Game1
         private int powerRNG;
         private string altfire;
 
+
+        //sounds
+        SoundEffect playerHit;
+        SoundEffect collectableGotten;
+
+        Song music;
+
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -185,6 +195,8 @@ namespace Game1
 
             spriteFont = Content.Load<SpriteFont>("FontFile");
 
+            //sounds
+            playerHit = Content.Load<SoundEffect>("Crash");
             character = Content.Load<Texture2D>("arrow");
             player.Texture = character;
 
@@ -263,6 +275,7 @@ namespace Game1
                     UpdateInGame(gameTime);
                     if (player.Health <= 0) //Ends current game if player health is equal to or below 0
                     {
+                        MediaPlayer.Stop();
                         gameState = GameState.GameOver;
                     }
                     break;
@@ -306,6 +319,8 @@ namespace Game1
             {
                 reader = new FileReader(level1);
                 reader.ReadLine();
+                music = Content.Load<Song>("Level1Song");
+                MediaPlayer.Play(music);
                 gameState = GameState.InGame;
             }
             else if (level2Button.checkPressed(mouse))
@@ -422,6 +437,8 @@ namespace Game1
                     enemies.RemoveAt(i);
                     i--;
                     player.Health--;
+                    
+                    playerHit.Play();//plays hit sound effect
                 }
             }
 
