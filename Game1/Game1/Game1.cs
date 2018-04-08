@@ -71,6 +71,14 @@ namespace Game1
         //credits
         private Button back;
         private Texture2D backTexture;
+
+        //pause menu
+        private Texture2D pauseTexture;
+        private Texture2D pauseMenuTexture;
+        private Texture2D pauseQuitTexture;
+        private Button pauseMenuButton;
+        private Button pauseQuitButton;
+
         //enemy bullets
         private List<EnemyBullet> enemies;
         private Texture2D enemyTexture;
@@ -177,6 +185,10 @@ namespace Game1
             retryButton = new Button(new Rectangle(71, 570, 263, 134));
             returnToMenuButton = new Button(new Rectangle(464, 570, 263, 134));
 
+            //pause menu
+            pauseMenuButton = new Button(new Rectangle(268, 382, 263, 58));
+            pauseQuitButton = new Button(new Rectangle(268, 469, 263, 58));
+
             base.Initialize();
             // Drew Donovan
             // Quinn Hopwood
@@ -226,6 +238,11 @@ namespace Game1
             levelLost = Content.Load<Texture2D>("GameOverScreen");
             retry = Content.Load<Texture2D>("RETRY");
             returnToMenu = Content.Load<Texture2D>("MENU");
+            //pause menu
+            pauseTexture = Content.Load<Texture2D>("PauseScreen");
+            pauseQuitTexture = Content.Load<Texture2D>("PauseQUIT");
+            pauseMenuTexture = Content.Load<Texture2D>("PauseMENU");
+            
             // TODO: use this.Content to load your game content here
         }
 
@@ -267,6 +284,12 @@ namespace Game1
                     UpdateCredits(gameTime);
                     break;
                 case GameState.Paused:
+                    if (kbState.IsKeyDown(Keys.Space) && prevKbsState.IsKeyUp(Keys.Space))
+                    {
+                        gameState = GameState.InGame;
+                        MediaPlayer.Resume();
+                        
+                    }
                     break;
                 case GameState.LevelSelect:
                     UpdateLevelSelect(gameTime);
@@ -277,6 +300,11 @@ namespace Game1
                     {
                         MediaPlayer.Stop();
                         gameState = GameState.GameOver;
+                    }
+                    if(kbState.IsKeyDown(Keys.Space)&& prevKbsState.IsKeyUp(Keys.Space))
+                    {
+                        MediaPlayer.Pause();
+                        gameState = GameState.Paused;
                     }
                     break;
                 case GameState.LevelComplete:
@@ -299,15 +327,15 @@ namespace Game1
 
             //changes menu screens
             
-            if(menuStart.checkPressed(mouse))
+            if(menuStart.checkPressed(mouse) && menuStart.checkPressed(prevMouseState) == false)
             {
                 gameState = GameState.LevelSelect;
             }
-            if (menuCredits.checkPressed(mouse))
+            if (menuCredits.checkPressed(mouse) && menuCredits.checkPressed(prevMouseState) == false)
             {
                 gameState = GameState.Credits;
             }
-            if (menuQuit.checkPressed(mouse))
+            if (menuQuit.checkPressed(mouse) && menuQuit.checkPressed(prevMouseState) == false)
             {
                 Exit();
             }
@@ -315,7 +343,7 @@ namespace Game1
         protected void UpdateLevelSelect(GameTime gameTime)
         {
             //currently only level one has any data, so trying to play any of the others will crash the program
-            if (level1Button.checkPressed(mouse))
+            if (level1Button.checkPressed(mouse) && level1Button.checkPressed(prevMouseState) == false)
             {
                 reader = new FileReader(level1);
                 reader.ReadLine();
@@ -323,19 +351,19 @@ namespace Game1
                 MediaPlayer.Play(music);
                 gameState = GameState.InGame;
             }
-            else if (level2Button.checkPressed(mouse))
+            else if (level2Button.checkPressed(mouse) && level2Button.checkPressed(prevMouseState) == false)
             {
                 reader = new FileReader(level2);
                 reader.ReadLine();
                 gameState = GameState.InGame;
             }
-            else if (level3Button.checkPressed(mouse))
+            else if (level3Button.checkPressed(mouse) && level3Button.checkPressed(prevMouseState) == false)
             {
                 reader = new FileReader(level3);
                 reader.ReadLine();
                 gameState = GameState.InGame;
             }
-            else if (level4Button.checkPressed(mouse))
+            else if (level4Button.checkPressed(mouse) && level4Button.checkPressed(prevMouseState) == false)
             {
                 reader = new FileReader(level4);
                 reader.ReadLine();
@@ -355,11 +383,11 @@ namespace Game1
         }
         protected void UpdateGameOver(GameTime gameTime)
         {
-            if (returnToMenuButton.checkPressed(mouse))
+            if (returnToMenuButton.checkPressed(mouse) && returnToMenuButton.checkPressed(prevMouseState) == false)
             {
                 gameState = GameState.MainMenu;
             }
-            else if (retryButton.checkPressed(mouse))
+            else if (retryButton.checkPressed(mouse) && retryButton.checkPressed(prevMouseState) == false)
             {
                 gameState = GameState.InGame;
             }
@@ -666,6 +694,9 @@ namespace Game1
                     DrawLevelSelect(gameTime);
                     break;
                 case GameState.Paused:
+                    DrawInGame(gameTime);
+                    DrawPaused(gameTime);
+                    
                     break;
                 case GameState.InGame:
                     DrawInGame(gameTime);
@@ -765,6 +796,7 @@ namespace Game1
         protected void DrawGameOver(GameTime gameTime)
         {
             spriteBatch.Draw(levelLost, new Rectangle(0, 0, 800, 800), Color.White);
+            spriteBatch.DrawString(spriteFont, MediaPlayer.PlayPosition.ToString(), new Vector2(300, 180), Color.Black);
             if (retryButton.checkHover(mouse))//checks if mouse is over start button
             {
                 spriteBatch.Draw(retry, retryButton.rectangle, Color.Green);
@@ -782,6 +814,27 @@ namespace Game1
                 spriteBatch.Draw(returnToMenu, returnToMenuButton.rectangle, Color.White);
             }
             
+        }
+        protected void DrawPaused(GameTime gameTime)
+        {
+            spriteBatch.Draw(pauseTexture, new Rectangle(0, 0, 800, 800), Color.White);
+
+            if (pauseMenuButton.checkHover(mouse))//checks if mouse is over start button
+            {
+                spriteBatch.Draw(pauseMenuTexture, pauseMenuButton.rectangle, Color.Teal);
+            }
+            else
+            {
+                spriteBatch.Draw(pauseMenuTexture, pauseMenuButton.rectangle, Color.White);
+            }
+            if (pauseQuitButton.checkHover(mouse))//checks if mouse is over start button
+            {
+                spriteBatch.Draw(pauseQuitTexture, pauseQuitButton.rectangle, Color.Teal);
+            }
+            else
+            {
+                spriteBatch.Draw(pauseQuitTexture, pauseQuitButton.rectangle, Color.White);
+            }
         }
         protected void DrawInGame(GameTime gameTime)
         {
