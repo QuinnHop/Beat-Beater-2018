@@ -14,6 +14,7 @@ namespace Game1
         //properties
         public string Type { get { return type; } }
 
+
         //constructor
         public PowerUps(int x, int y, int width, int height, float speed, string type) : base(x, y, height, width, speed)
         {
@@ -22,29 +23,5 @@ namespace Game1
         }
         //methods
 
-        public void Shield()
-        {
-            
-        }
-
-        public void Heal()
-        {
-            
-        }
-
-        public void SpeedUp()
-        {
-
-        }
-
-        public void AltFireSpread()
-        {
-
-        }
-
-        public void AltFireBig()
-        {
-
-        }
     }
 }
