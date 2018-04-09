@@ -97,6 +97,7 @@ namespace Game1
 
         //level information
         FileReader reader;
+        string currentLevel;
         string level1;
         string level2;
         string level3;
@@ -300,6 +301,7 @@ namespace Game1
                     {
                         MediaPlayer.Stop();
                         gameState = GameState.GameOver;
+                        
                     }
                     if(kbState.IsKeyDown(Keys.Space)&& prevKbsState.IsKeyUp(Keys.Space))
                     {
@@ -308,11 +310,10 @@ namespace Game1
                     }
                     break;
                 case GameState.LevelComplete:
-                    player.Health = 10;
+                    ResetLevel();
                     break;
                 case GameState.GameOver:
                     UpdateGameOver(gameTime);
-                    player.Health = 10;
                     break;
             }
 
@@ -345,6 +346,7 @@ namespace Game1
             //currently only level one has any data, so trying to play any of the others will crash the program
             if (level1Button.checkPressed(mouse) && level1Button.checkPressed(prevMouseState) == false)
             {
+                currentLevel = level1;
                 reader = new FileReader(level1);
                 reader.ReadLine();
                 music = Content.Load<Song>("Level1Song");
@@ -353,18 +355,21 @@ namespace Game1
             }
             else if (level2Button.checkPressed(mouse) && level2Button.checkPressed(prevMouseState) == false)
             {
+                currentLevel = level2;
                 reader = new FileReader(level2);
                 reader.ReadLine();
                 gameState = GameState.InGame;
             }
             else if (level3Button.checkPressed(mouse) && level3Button.checkPressed(prevMouseState) == false)
             {
+                currentLevel = level3;
                 reader = new FileReader(level3);
                 reader.ReadLine();
                 gameState = GameState.InGame;
             }
             else if (level4Button.checkPressed(mouse) && level4Button.checkPressed(prevMouseState) == false)
             {
+                currentLevel = level4;
                 reader = new FileReader(level4);
                 reader.ReadLine();
                 gameState = GameState.InGame;
@@ -385,11 +390,17 @@ namespace Game1
         {
             if (returnToMenuButton.checkPressed(mouse) && returnToMenuButton.checkPressed(prevMouseState) == false)
             {
+                ResetLevel();
+                
                 gameState = GameState.MainMenu;
+                
             }
             else if (retryButton.checkPressed(mouse) && retryButton.checkPressed(prevMouseState) == false)
             {
+                ResetLevel();
+                reader = new FileReader(currentLevel);
                 gameState = GameState.InGame;
+                
             }
         }
         protected void UpdateInGame(GameTime gameTime)
@@ -839,6 +850,7 @@ namespace Game1
         protected void DrawInGame(GameTime gameTime)
         {
             spriteBatch.DrawString(spriteFont, player.Health.ToString(), new Vector2(200, 20), Color.Black);
+            spriteBatch.DrawString(spriteFont, timer.ToString(), new Vector2(200, 40), Color.Black);
             foreach(EnemyBullet en in enemies)
             {
                 spriteBatch.Draw(en.Texture, en.Position, null, Color.White, 
@@ -873,6 +885,34 @@ namespace Game1
                 Color.White, (float)(angle + Math.PI/2), new Vector2(player.Texture.Width/2, 
                 player.Texture.Height/2), SpriteEffects.None, 0);
             spriteBatch.DrawString(spriteFont, "Score: " + (Math.Round(timer + bonusScore, 0)), fontVector, Color.Black);
+        }
+        
+        public void ResetLevel()
+        {
+            player.PositionX = 400;//resets player position
+            player.PositionY = 200;
+            bonusScore = 0;//resets score
+            reader.FinishFile();//finishes reading file
+            player.Health = 10;//resets player health
+            timer = 0;
+            while (enemies.Count > 0)//deletes enemy projectiles
+            {
+                enemies.RemoveAt(0);
+            }
+            while(collectables.Count > 0)//deletes collectables
+            {
+                collectables.RemoveAt(0);
+            }
+            while(pProjects.Count > 0)//deletes player projectiles
+            {
+                pProjects.RemoveAt(0);
+            }
+            while (powerUps.Count > 0)//deletes player projectiles
+            {
+                powerUps.RemoveAt(0);
+            }
+            ResetElapsedTime();
+            
         }
         
         //bullet spawner

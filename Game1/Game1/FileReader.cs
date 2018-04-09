@@ -73,6 +73,10 @@ namespace Game1
             yPosition = int.Parse(tempArray[4]);
             
         }
-
+        public void FinishFile()
+        {
+            stream.ReadToEnd();
+            stream.Close();
+        }
     }
 }
