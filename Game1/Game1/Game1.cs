@@ -115,6 +115,7 @@ namespace Game1
         private int bonusScore;
         //powerups
         PowerUps powerUp;
+        TimerPU powerTime;
         private Texture2D shieldTexture;
         private Texture2D healTexture;
         private Texture2D speedTexture;
@@ -122,7 +123,16 @@ namespace Game1
         private Texture2D bigShotTexture;
         private List<PowerUps> powerUps;
         private int powerRNG;
-        private string altfire;
+        private bool shield = false;
+        private bool speed = false;
+        private bool spread = false;
+        private bool bigShot = false;
+
+        public bool Shield { get { return shield; }  set { shield = value; } }
+        public bool Speed { get { return speed; }  set { speed = value; } }
+        public bool Spread { get { return spread; }  set { spread = value; } }
+        public bool BigShot { get { return bigShot; }  set { bigShot = value; } }
+
 
 
         //sounds
@@ -191,6 +201,7 @@ namespace Game1
             //pause menu
             pauseMenuButton = new Button(new Rectangle(268, 382, 263, 58));
             pauseQuitButton = new Button(new Rectangle(268, 469, 263, 58));
+
 
             base.Initialize();
             // Drew Donovan
@@ -405,7 +416,7 @@ namespace Game1
 
             if ((mouse.LeftButton == ButtonState.Pressed) && (prevMouseState.LeftButton == ButtonState.Released))//checks if player pressed space and fires a bullet
             {
-                if (altfire == "spread")
+                if (spread == true)
                 {
                     PlayerProjectile p = new PlayerProjectile(player.PositionX, player.PositionY, 25, 25, 7.0f);
                     p.Texture = pProjectileTexture;
@@ -421,7 +432,7 @@ namespace Game1
                     pProjects.Add(p);
                     Console.WriteLine("SHOT FIRED");
                 }
-                else if (altfire == "big")
+                else if (bigShot == true)
                 {
                     PlayerProjectile p = new PlayerProjectile(player.PositionX, player.PositionY, 50, 50, 7.0f);
                     p.Texture = pProjectileTexture;
@@ -465,14 +476,21 @@ namespace Game1
             //removes and damages player when enemy collides with it
             for (int i = 0; i < enemies.Count-1; i++)
             {
-                if (enemies[i].CheckCollision(enemies[i], player))
+                if (shield == true)
                 {
-                    enemies.RemoveAt(i);
-                    i--;
-                    player.Health--;
-                    
-                    playerHit.Play();//plays hit sound effect
+
                 }
+                else
+                {
+                    if (enemies[i].CheckCollision(enemies[i], player))
+                    {
+                        enemies.RemoveAt(i);
+                        i--;
+                        player.Health--;
+
+                        playerHit.Play();//plays hit sound effect
+                    }
+                } 
             }
 
             foreach(EnemyBullet en in enemies)
@@ -496,7 +514,7 @@ namespace Game1
                     }
                 }
             }
-            //checks to  remove player bullets out of bounds
+            //checks to remove player bullets out of bounds
             for (int i = 0; i < pProjects.Count - 1; i++)
             {
                 if (pProjects[i].CheckDelete(pProjects[i].PositionX, pProjects[i].PositionY))
@@ -543,55 +561,57 @@ namespace Game1
             }
             //powerup spawn
             rng = new Random();
-            powerRNG = rng.Next(100);
+            powerRNG = rng.Next(1000);
             if(powerRNG == 10)
             {
                 powerRNG = rng.Next(5);
                 //shield
                 if(powerRNG == 0)
                 {
-                    powerUp = new PowerUps(rng.Next(GraphicsDevice.Viewport.Width), rng.Next(GraphicsDevice.Viewport.Height), 25, 25, 0, "shield");
-                    powerUp.Texture = shieldTexture;
-                    powerUps.Add(powerUp);
-                }
-                //heal
-                else if (powerRNG == 1)
-                {
-                    powerUp = new PowerUps(rng.Next(GraphicsDevice.Viewport.Width), rng.Next(GraphicsDevice.Viewport.Height), 25, 25, 0, "heal");
-                    powerUp.Texture = healTexture;
-                    powerUps.Add(powerUp);
-                }
-                //speedup
-                else if (powerRNG == 2)
-                {
-                    powerUp = new PowerUps(rng.Next(GraphicsDevice.Viewport.Width), rng.Next(GraphicsDevice.Viewport.Height), 25, 25, 0, "speedup");
-                    powerUp.Texture = speedTexture;
-                    powerUps.Add(powerUp);
-                }
-                //altfirespread
-                else if (powerRNG == 3)
-                {
-                    powerUp = new PowerUps(rng.Next(GraphicsDevice.Viewport.Width), rng.Next(GraphicsDevice.Viewport.Height), 25, 25, 0, "altfirespread");
-                    powerUp.Texture = spreadTexture;
-                    powerUps.Add(powerUp);
-                }
-                //altfirebig
-                else
-                {
-                    powerUp = new PowerUps(rng.Next(GraphicsDevice.Viewport.Width), rng.Next(GraphicsDevice.Viewport.Height), 25, 25, 0, "altfirebig");
+                    powerUp = new PowerUps(rng.Next(GraphicsDevice.Viewport.Width), rng.Next(GraphicsDevice.Viewport.Height), 30, 30, 0, "shield");
+                    powerUp.Texture = shieldTexture;                                                                          
+                    powerUps.Add(powerUp);                                                                                    
+                }                                                                                                             
+                //heal                                                                                                        
+                else if (powerRNG == 1)                                                                                       
+                {                                                                                                             
+                    powerUp = new PowerUps(rng.Next(GraphicsDevice.Viewport.Width), rng.Next(GraphicsDevice.Viewport.Height), 30, 30, 0, "heal");
+                    powerUp.Texture = healTexture;                                                                            
+                    powerUps.Add(powerUp);                                                                                    
+                }                                                                                                             
+                //speedup                                                                                                     
+                else if (powerRNG == 2)                                                                                       
+                {                                                                                                             
+                    powerUp = new PowerUps(rng.Next(GraphicsDevice.Viewport.Width), rng.Next(GraphicsDevice.Viewport.Height), 30, 30, 0, "speedup");
+                    powerUp.Texture = speedTexture;                                                                           
+                    powerUps.Add(powerUp);                                                                                    
+                }                                                                                                             
+                //altfirespread                                                                                               
+                else if (powerRNG == 3)                                                                                       
+                {                                                                                                              
+                    powerUp = new PowerUps(rng.Next(GraphicsDevice.Viewport.Width), rng.Next(GraphicsDevice.Viewport.Height), 30, 30, 0, "altfirespread");
+                    powerUp.Texture = spreadTexture;                                                                          
+                    powerUps.Add(powerUp);                                                                                    
+                }                                                                                                             
+                //altfirebig                                                                                                  
+                else                                                                                                          
+                {                                                                                                             
+                    powerUp = new PowerUps(rng.Next(GraphicsDevice.Viewport.Width), rng.Next(GraphicsDevice.Viewport.Height), 30, 30, 0, "altfirebig");
                     powerUp.Texture = bigShotTexture;
                     powerUps.Add(powerUp);
                 }
             }
 
             //powerUp collision
+            //powerTime = new TimerPU();
+            //powerTime.Timer();
             for (int i = 0; i < powerUps.Count; i++)
             {
                 if (powerUps[i].Position.Intersects(player.Position))
                 {
                     if (powerUps[i].Type == "shield")
                     {
-                        //do what it needs to do
+                        shield = true;
                         powerUps.RemoveAt(i);
                         Console.WriteLine("PICKED UP SHIELD");
                         i--;
@@ -608,6 +628,7 @@ namespace Game1
                         if (player.Speed == 5f)
                         {
                             player.Speed = 10f;
+                            speed = true;
                         }
                         powerUps.RemoveAt(i);
                         Console.WriteLine("PICKED UP SPEED");
@@ -615,14 +636,14 @@ namespace Game1
                     }
                     else if (powerUps[i].Type == "altfirespread")
                     {
-                        altfire = "spread";
+                        spread = true;
                         powerUps.RemoveAt(i);
                         Console.WriteLine("PICKED UP SPREAD SHOT");
                         i--;
                     }
                     else if (powerUps[i].Type == "altfirebig")
                     {
-                        altfire = "big";
+                        bigShot = true;
                         powerUps.RemoveAt(i);
                         Console.WriteLine("PICKED UP BIG SHOT");
                         i--;
