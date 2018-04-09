@@ -82,6 +82,7 @@ namespace Game1
         //enemy bullets
         private List<EnemyBullet> enemies;
         private Texture2D enemyTexture;
+        private Texture2D homingEnemyTexture;
         public float timer;
 
         //game over
@@ -214,7 +215,8 @@ namespace Game1
             character = Content.Load<Texture2D>("arrow");
             player.Texture = character;
 
-            enemyTexture = Content.Load<Texture2D>("enemybullet");
+            enemyTexture = Content.Load<Texture2D>("EnemySprite");
+            homingEnemyTexture = Content.Load<Texture2D>("HomingEnemySprite");
             pProjectileTexture = Content.Load<Texture2D>("PlayerProjectileSprite");
 
             collectTexture = Content.Load<Texture2D>("coin");
@@ -656,7 +658,7 @@ namespace Game1
                     Console.WriteLine("Current reader time: " + reader.TimeStamp + ". Current Game time: " + timer);
                     reader.xPosition += rng.Next(25, 100);//spaces bullets out
                     reader.yPosition += rng.Next(25, 100);
-                    Hbullet.Texture = enemyTexture;
+                    Hbullet.Texture = homingEnemyTexture;
                     Hbullet.Angle = Hbullet.FindAngle(Hbullet, player);
                     Hbullet.AttackName = "homing";
                     enemies.Add(Hbullet);
