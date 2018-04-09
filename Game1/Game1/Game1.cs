@@ -90,10 +90,12 @@ namespace Game1
         private Texture2D retry;
         private Button returnToMenuButton;
         private Button retryButton;
+
         //player
         Player player;
         public Texture2D character;
         private List<PlayerProjectile> pProjects;
+        private Texture2D pProjectileTexture;
 
         //level information
         FileReader reader;
@@ -213,6 +215,7 @@ namespace Game1
             player.Texture = character;
 
             enemyTexture = Content.Load<Texture2D>("enemybullet");
+            pProjectileTexture = Content.Load<Texture2D>("PlayerProjectileSprite");
 
             collectTexture = Content.Load<Texture2D>("coin");
             shieldTexture = Content.Load<Texture2D>("shield");//placements
@@ -403,15 +406,15 @@ namespace Game1
                 if (altfire == "spread")
                 {
                     PlayerProjectile p = new PlayerProjectile(player.PositionX, player.PositionY, 25, 25, 7.0f);
-                    p.Texture = enemyTexture;
+                    p.Texture = pProjectileTexture;
                     p.Angle = (float)angle + 1;
                     pProjects.Add(p);
                     p = new PlayerProjectile(player.PositionX, player.PositionY, 25, 25, 7.0f);
-                    p.Texture = enemyTexture;
+                    p.Texture = pProjectileTexture;
                     p.Angle = (float)angle - 1;
                     pProjects.Add(p);
                     p = new PlayerProjectile(player.PositionX, player.PositionY, 25, 25, 7.0f);
-                    pProjects.Add(p); p.Texture = enemyTexture;
+                    pProjects.Add(p); p.Texture = pProjectileTexture;
                     p.Angle = (float)angle;
                     pProjects.Add(p);
                     Console.WriteLine("SHOT FIRED");
@@ -419,14 +422,14 @@ namespace Game1
                 else if (altfire == "big")
                 {
                     PlayerProjectile p = new PlayerProjectile(player.PositionX, player.PositionY, 50, 50, 7.0f);
-                    p.Texture = enemyTexture;
+                    p.Texture = pProjectileTexture;
                     p.Angle = (float)angle;
                     pProjects.Add(p);
                 }
                 else
                 {
                     PlayerProjectile p = new PlayerProjectile(player.PositionX, player.PositionY, 25, 25, 7.0f);
-                    p.Texture = enemyTexture;
+                    p.Texture = pProjectileTexture;
                     p.Angle = (float)angle;
                     pProjects.Add(p);
                     Console.WriteLine("SHOT FIRED");
