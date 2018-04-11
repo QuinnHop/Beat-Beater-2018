@@ -120,7 +120,6 @@ namespace Game1
         private int bonusScore;
         //powerups
         PowerUps powerUp;
-        TimerPU powerTime;
         private Texture2D shieldTexture;
         private Texture2D healTexture;
         private Texture2D speedTexture;
@@ -637,8 +636,6 @@ namespace Game1
             }
 
             //powerUp collision
-            //powerTime = new TimerPU();
-            //powerTime.Timer();
             for (int i = 0; i < powerUps.Count; i++)
             {
                 if (powerUps[i].Position.Intersects(player.Position))
@@ -956,6 +953,11 @@ namespace Game1
             bonusScore = 0;//resets score
             reader.FinishFile();//finishes reading file
             player.Health = 10;//resets player health
+            //making sure powerups dont continue cross levels
+            shield = false;
+            speed = false;
+            spread = false;
+            bigShot = false;
             timer = 0;
             while (enemies.Count > 0)//deletes enemy projectiles
             {
@@ -965,7 +967,11 @@ namespace Game1
             {
                 collectables.RemoveAt(0);
             }
-            while(pProjects.Count > 0)//deletes player projectiles
+            while (powerUps.Count > 0)//deletes powerups
+            {
+                powerUps.RemoveAt(0);
+            }
+            while (pProjects.Count > 0)//deletes player projectiles
             {
                 pProjects.RemoveAt(0);
             }
