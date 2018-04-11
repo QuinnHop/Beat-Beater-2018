@@ -92,6 +92,10 @@ namespace Game1
         private Button returnToMenuButton;
         private Button retryButton;
 
+        //level complete
+        private Texture2D levelCompleteTexture;
+        private Texture2D levelCompleteBTexture;
+        private Button levelCompleteButton;
         //player
         Player player;
         public Texture2D character;
@@ -199,6 +203,9 @@ namespace Game1
             retryButton = new Button(new Rectangle(71, 570, 263, 134));
             returnToMenuButton = new Button(new Rectangle(464, 570, 263, 134));
 
+            //level complete
+            levelCompleteButton = new Button(new Rectangle(116, 509, 568, 171));
+
             //pause menu
             pauseMenuButton = new Button(new Rectangle(268, 382, 263, 58));
             pauseQuitButton = new Button(new Rectangle(268, 469, 263, 58));
@@ -255,6 +262,9 @@ namespace Game1
             levelLost = Content.Load<Texture2D>("GameOverScreen");
             retry = Content.Load<Texture2D>("RETRY");
             returnToMenu = Content.Load<Texture2D>("MENU");
+            //level complete
+            levelCompleteTexture = Content.Load<Texture2D>("LevelComplete");
+            levelCompleteBTexture = Content.Load<Texture2D>("RETURN TO MENU");
             //pause menu
             pauseTexture = Content.Load<Texture2D>("PauseScreen");
             pauseQuitTexture = Content.Load<Texture2D>("PauseQUIT");
@@ -324,9 +334,13 @@ namespace Game1
                         MediaPlayer.Pause();
                         gameState = GameState.Paused;
                     }
+                    if (reader.LevelComplete)
+                    {
+                        gameState = GameState.LevelComplete;
+                    }
                     break;
                 case GameState.LevelComplete:
-                    ResetLevel();
+                    UpdateLevelComplete(gameTime);
                     break;
                 case GameState.GameOver:
                     UpdateGameOver(gameTime);
@@ -419,6 +433,15 @@ namespace Game1
                 
             }
         }
+        protected void UpdateLevelComplete(GameTime gameTime)
+        {
+            if (levelCompleteButton.checkPressed(mouse) && levelCompleteButton.checkPressed(prevMouseState))
+            {
+                gameState = GameState.MainMenu;
+                ResetLevel();
+            }
+                
+        }
         protected void UpdateInGame(GameTime gameTime)
         {
             //angle calculations for player
@@ -459,7 +482,7 @@ namespace Game1
                     Console.WriteLine("SHOT FIRED");
                 }
             }
-
+            
 
             //creates bullets
             
@@ -733,7 +756,6 @@ namespace Game1
                 case GameState.Paused:
                     DrawInGame(gameTime);
                     DrawPaused(gameTime);
-                    
                     break;
                 case GameState.InGame:
                     DrawInGame(gameTime);
@@ -741,6 +763,9 @@ namespace Game1
                     {
                         gameState = GameState.GameOver;
                     }
+                    break;
+                case GameState.LevelComplete:
+                    DrawLevelComplete(gameTime);
                     break;
                 case GameState.GameOver:
                     DrawGameOver(gameTime);
@@ -849,8 +874,19 @@ namespace Game1
             else
             {
                 spriteBatch.Draw(returnToMenu, returnToMenuButton.rectangle, Color.White);
+            }   
+        }
+        protected void DrawLevelComplete(GameTime gameTime)
+        {
+            spriteBatch.Draw(levelCompleteTexture, new Rectangle(0, 0, 800, 800), Color.White);
+            if (levelCompleteButton.checkHover(mouse))//checks if mouse is over start button
+            {
+                spriteBatch.Draw(levelCompleteBTexture, levelCompleteButton.rectangle, Color.Teal);
             }
-            
+            else
+            {
+                spriteBatch.Draw(levelCompleteBTexture, levelCompleteButton.rectangle, Color.White);
+            }
         }
         protected void DrawPaused(GameTime gameTime)
         {
