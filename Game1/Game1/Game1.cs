@@ -232,8 +232,7 @@ namespace Game1
 
             //sounds
             playerHit = Content.Load<SoundEffect>("Crash");
-            character = Content.Load<Texture2D>("PlayerSprite1");
-            player.Texture = character;
+            player.Texture = Content.Load<Texture2D>("PlayerSprite1");
             playerShield = Content.Load<Texture2D>("playerShield");
             hurtOverlay = Content.Load<Texture2D>("playerHurtOverlay");
 
@@ -241,12 +240,12 @@ namespace Game1
             homingEnemyTexture = Content.Load<Texture2D>("HomingEnemySprite");
             pProjectileTexture = Content.Load<Texture2D>("PlayerProjectileSprite");
 
-            collectTexture = Content.Load<Texture2D>("coin");
-            shieldTexture = Content.Load<Texture2D>("shield");//placements
-            healTexture = Content.Load<Texture2D>("health");//placements
+            collectTexture = Content.Load<Texture2D>("CoinSprite");
+            shieldTexture = Content.Load<Texture2D>("ShieldPowerupSprite");
+            healTexture = Content.Load<Texture2D>("HealthPowerupSprite");
             speedTexture = Content.Load<Texture2D>("speed");//placements
-            spreadTexture = Content.Load<Texture2D>("spreadshot");//placements
-            bigShotTexture = Content.Load<Texture2D>("bigshot");//placements
+            spreadTexture = Content.Load<Texture2D>("MultiPowerupSprite");
+            bigShotTexture = Content.Load<Texture2D>("BigPowerupSprite");
 
             //main menu
             menuTexture = Content.Load<Texture2D>("MainMenu");
