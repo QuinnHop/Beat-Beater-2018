@@ -232,8 +232,7 @@ namespace Game1
 
             //sounds
             playerHit = Content.Load<SoundEffect>("Crash");
-            character = Content.Load<Texture2D>("arrow");
-            player.Texture = character;
+            player.Texture = Content.Load<Texture2D>("PlayerSprite1");
             playerShield = Content.Load<Texture2D>("playerShield");
             hurtOverlay = Content.Load<Texture2D>("playerHurtOverlay");
 
