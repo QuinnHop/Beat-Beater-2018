@@ -240,9 +240,9 @@ namespace Game1
             homingEnemyTexture = Content.Load<Texture2D>("HomingEnemySprite");
             pProjectileTexture = Content.Load<Texture2D>("PlayerProjectileSprite");
 
-            collectTexture = Content.Load<Texture2D>("coin");//placements
+            collectTexture = Content.Load<Texture2D>("CoinSprite");
             shieldTexture = Content.Load<Texture2D>("shield");//placements
-            healTexture = Content.Load<Texture2D>("health");//placements
+            healTexture = Content.Load<Texture2D>("HealthPowerupSprite");
             speedTexture = Content.Load<Texture2D>("speed");//placements
             spreadTexture = Content.Load<Texture2D>("MultiPowerupSprite");
             bigShotTexture = Content.Load<Texture2D>("BigPowerupSprite");
