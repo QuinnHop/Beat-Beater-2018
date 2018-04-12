@@ -241,7 +241,7 @@ namespace Game1
             pProjectileTexture = Content.Load<Texture2D>("PlayerProjectileSprite");
 
             collectTexture = Content.Load<Texture2D>("CoinSprite");
-            shieldTexture = Content.Load<Texture2D>("shield");//placements
+            shieldTexture = Content.Load<Texture2D>("ShieldPowerupSprite");
             healTexture = Content.Load<Texture2D>("HealthPowerupSprite");
             speedTexture = Content.Load<Texture2D>("speed");//placements
             spreadTexture = Content.Load<Texture2D>("MultiPowerupSprite");
