@@ -42,7 +42,7 @@ namespace Game1
 
         //random
         Random rng;
-
+        Texture2D hurtOverlay;
         //font
         private SpriteFont spriteFont;
         private Vector2 fontVector = new Vector2(350, 0);
@@ -84,6 +84,7 @@ namespace Game1
         private Texture2D enemyTexture;
         private Texture2D homingEnemyTexture;
         public float timer;
+        public float hurtTimer;
 
         //game over
         private Texture2D levelLost;
@@ -101,6 +102,7 @@ namespace Game1
         public Texture2D character;
         private List<PlayerProjectile> pProjects;
         private Texture2D pProjectileTexture;
+        private Texture2D playerShield;
 
         //level information
         FileReader reader;
@@ -232,6 +234,8 @@ namespace Game1
             playerHit = Content.Load<SoundEffect>("Crash");
             character = Content.Load<Texture2D>("arrow");
             player.Texture = character;
+            playerShield = Content.Load<Texture2D>("playerShield");
+            hurtOverlay = Content.Load<Texture2D>("playerHurtOverlay");
 
             enemyTexture = Content.Load<Texture2D>("EnemySprite");
             homingEnemyTexture = Content.Load<Texture2D>("HomingEnemySprite");
@@ -304,6 +308,7 @@ namespace Game1
             switch (gameState)
             {
                 case GameState.MainMenu:
+                    shield = true;
                     UpdateMenu(gameTime);
                     break;
                 case GameState.Credits:
@@ -509,20 +514,22 @@ namespace Game1
             //removes and damages player when enemy collides with it
             for (int i = 0; i < enemies.Count-1; i++)
             {
-                if (shield == true)
+             
+                if (enemies[i].CheckCollision(enemies[i], player))
                 {
-
-                }
-                else
-                {
-                    if (enemies[i].CheckCollision(enemies[i], player))
+                    enemies.RemoveAt(i);
+                    i--;
+                    if(shield)
                     {
-                        enemies.RemoveAt(i);
-                        i--;
-                        player.Health--;
-
-                        playerHit.Play();//plays hit sound effect
+                        shield = false;
                     }
+                    else
+                    {
+                        player.Health--;
+                        playerHit.Play();//plays hit sound effect
+                        hurtTimer = timer + 1.05f;
+                    }
+                    
                 } 
             }
 
@@ -732,7 +739,7 @@ namespace Game1
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.ForestGreen);
+            GraphicsDevice.Clear(Color.GhostWhite);
 
             
             // TODO: Add your drawing code here
@@ -908,7 +915,12 @@ namespace Game1
         }
         protected void DrawInGame(GameTime gameTime)
         {
+            
             spriteBatch.DrawString(spriteFont, player.Health.ToString(), new Vector2(200, 20), Color.Black);
+            if(hurtTimer > timer)
+            {
+                spriteBatch.Draw(hurtOverlay, new Rectangle(0, 0, 800, 800), Color.White);
+            }
             spriteBatch.DrawString(spriteFont, timer.ToString(), new Vector2(200, 40), Color.Black);
             foreach(EnemyBullet en in enemies)
             {
@@ -930,7 +942,12 @@ namespace Game1
             {
                 spriteBatch.Draw(p.Texture, p.Position, Color.White);
             }
-
+            if (shield)
+            {
+                spriteBatch.Draw(playerShield, new Rectangle(player.PositionX, player.PositionY, 128, 128), null, Color.White,
+                    0, new Vector2(player.Texture.Width/2, player.Texture.Height/2), SpriteEffects.None, 0);
+            }
+            
             //this is the drawing of the player overloads are as follows:
             //player.Texture: the texture to load
             //player.position: The rectangle it derives it's position from
@@ -948,6 +965,7 @@ namespace Game1
         
         public void ResetLevel()
         {
+            
             player.PositionX = 400;//resets player position
             player.PositionY = 200;
             bonusScore = 0;//resets score
@@ -959,6 +977,7 @@ namespace Game1
             spread = false;
             bigShot = false;
             timer = 0;
+            hurtTimer = 0;
             while (enemies.Count > 0)//deletes enemy projectiles
             {
                 enemies.RemoveAt(0);
