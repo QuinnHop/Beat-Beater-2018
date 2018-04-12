@@ -97,9 +97,9 @@ namespace Game1
         private Texture2D levelCompleteTexture;
         private Texture2D levelCompleteBTexture;
         private Button levelCompleteButton;
+
         //player
         Player player;
-        public Texture2D character;
         private List<PlayerProjectile> pProjects;
         private Texture2D pProjectileTexture;
         private Texture2D playerShield;
@@ -486,12 +486,12 @@ namespace Game1
                     Console.WriteLine("SHOT FIRED");
                 }
             }
-            
+
 
             //creates bullets
-            
+
             timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
-            foreach(EnemyBullet en in enemies)//moves enemy bullets
+            foreach (EnemyBullet en in enemies)//moves enemy bullets
             {
                 en.PositionX += (int)(en.Speed * Math.Cos(en.Angle));
                 en.PositionY += (int)(en.Speed * Math.Sin(en.Angle));
@@ -503,7 +503,7 @@ namespace Game1
                 p.PositionY += (int)(p.Speed * Math.Sin(p.Angle));
             }
             //checks to enemy remove bullets out of bounds
-            for (int i = 0; i < enemies.Count-1; i++)
+            for (int i = 0; i < enemies.Count - 1; i++)
             {
                 if (enemies[i].CheckDelete(enemies[i].PositionX, enemies[i].PositionY))
                 {
@@ -512,7 +512,7 @@ namespace Game1
                 }
             }
             //removes and damages player when enemy collides with it
-            for (int i = 0; i < enemies.Count-1; i++)
+            for (int i = 0; i < enemies.Count - 1; i++)
             {
              
                 if (enemies[i].CheckCollision(enemies[i], player))
@@ -529,8 +529,25 @@ namespace Game1
                         playerHit.Play();//plays hit sound effect
                         hurtTimer = timer + 1.05f;
                     }
-                    
-                } 
+                }
+            }
+
+            //Changes player sprite based on health
+            if (player.Health >= 10)
+            {
+                player.Texture = Content.Load<Texture2D>("PlayerSprite1");
+            }
+            else if (player.Health < 10 && player.Health >= 7)
+            {
+                player.Texture = Content.Load<Texture2D>("PlayerSprite2");
+            }
+            else if (player.Health < 7 && player.Health >= 4)
+            {
+                player.Texture = Content.Load<Texture2D>("PlayerSprite3");
+            }
+            else if (player.Health < 4 && player.Health >= 1)
+            {
+                player.Texture = Content.Load<Texture2D>("PlayerSprite4");
             }
 
             foreach(EnemyBullet en in enemies)
