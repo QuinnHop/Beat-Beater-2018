@@ -85,7 +85,7 @@ namespace Game1
         private Texture2D homingEnemyTexture;
         public float timer;
         public float hurtTimer;
-
+        public float shieldTimer;
         //game over
         private Texture2D levelLost;
         private Texture2D returnToMenu;
@@ -103,7 +103,7 @@ namespace Game1
         private List<PlayerProjectile> pProjects;
         private Texture2D pProjectileTexture;
         private Texture2D playerShield;
-
+        private Texture2D character;
         //level information
         FileReader reader;
         string currentLevel;
@@ -232,7 +232,7 @@ namespace Game1
 
             //sounds
             playerHit = Content.Load<SoundEffect>("Crash");
-            character = Content.Load<Texture2D>("arrow");
+            character = Content.Load<Texture2D>("PlayerSprite1");
             player.Texture = character;
             playerShield = Content.Load<Texture2D>("playerShield");
             hurtOverlay = Content.Load<Texture2D>("playerHurtOverlay");
@@ -309,6 +309,7 @@ namespace Game1
             {
                 case GameState.MainMenu:
                     shield = true;
+                    shieldTimer = 3;
                     UpdateMenu(gameTime);
                     break;
                 case GameState.Credits:
@@ -668,6 +669,7 @@ namespace Game1
                     {
                         shield = true;
                         powerUps.RemoveAt(i);
+                        shieldTimer = timer + 3;
                         Console.WriteLine("PICKED UP SHIELD");
                         i--;
                     }
@@ -959,11 +961,11 @@ namespace Game1
             {
                 spriteBatch.Draw(p.Texture, p.Position, Color.White);
             }
-            if (shield)
+            if (shield && shieldTimer > timer)
             {
-                spriteBatch.Draw(playerShield, new Rectangle(player.PositionX, player.PositionY, 128, 128), null, Color.White,
-                    0, new Vector2(player.Texture.Width/2, player.Texture.Height/2), SpriteEffects.None, 0);
+                spriteBatch.Draw(playerShield, new Rectangle(player.PositionX-50, player.PositionY-50, 128, 128), Color.White);
             }
+            else { shield = false; }
             
             //this is the drawing of the player overloads are as follows:
             //player.Texture: the texture to load
@@ -995,6 +997,7 @@ namespace Game1
             bigShot = false;
             timer = 0;
             hurtTimer = 0;
+            player.Texture = character;
             while (enemies.Count > 0)//deletes enemy projectiles
             {
                 enemies.RemoveAt(0);
