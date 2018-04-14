@@ -85,7 +85,7 @@ namespace Game1
         private Texture2D homingEnemyTexture;
         public float timer;
         public float hurtTimer;
-        public float shieldTimer;
+      
         //game over
         private Texture2D levelLost;
         private Texture2D returnToMenu;
@@ -133,6 +133,10 @@ namespace Game1
         private bool speed = false;
         private bool spread = false;
         private bool bigShot = false;
+        public float shieldTimer;
+        public float speedTimer;
+        public float spreadTimer;
+        public float bigShotTimer;
 
         public bool Shield { get { return shield; }  set { shield = value; } }
         public bool Speed { get { return speed; }  set { speed = value; } }
@@ -243,7 +247,7 @@ namespace Game1
             collectTexture = Content.Load<Texture2D>("CoinSprite");
             shieldTexture = Content.Load<Texture2D>("ShieldPowerupSprite");
             healTexture = Content.Load<Texture2D>("HealthPowerupSprite");
-            speedTexture = Content.Load<Texture2D>("speed");//placements
+            speedTexture = Content.Load<Texture2D>("SpeedPowerupSprite");
             spreadTexture = Content.Load<Texture2D>("MultiPowerupSprite");
             bigShotTexture = Content.Load<Texture2D>("BigPowerupSprite");
 
@@ -307,8 +311,6 @@ namespace Game1
             switch (gameState)
             {
                 case GameState.MainMenu:
-                    shield = true;
-                    shieldTimer = 3;
                     UpdateMenu(gameTime);
                     break;
                 case GameState.Credits:
@@ -454,7 +456,7 @@ namespace Game1
 
             if ((mouse.LeftButton == ButtonState.Pressed) && (prevMouseState.LeftButton == ButtonState.Released))//checks if player pressed space and fires a bullet
             {
-                if (spread == true)
+                if (spread == true && spreadTimer > timer)
                 {
                     PlayerProjectile p = new PlayerProjectile(player.PositionX, player.PositionY, 25, 25, 7.0f);
                     p.Texture = pProjectileTexture;
@@ -470,7 +472,7 @@ namespace Game1
                     pProjects.Add(p);
                     Console.WriteLine("SHOT FIRED");
                 }
-                else if (bigShot == true)
+                else if (bigShot == true && bigShotTimer > timer)
                 {
                     PlayerProjectile p = new PlayerProjectile(player.PositionX, player.PositionY, 50, 50, 7.0f);
                     p.Texture = pProjectileTexture;
@@ -668,7 +670,7 @@ namespace Game1
                     {
                         shield = true;
                         powerUps.RemoveAt(i);
-                        shieldTimer = timer + 3;
+                        shieldTimer = timer + 5;
                         Console.WriteLine("PICKED UP SHIELD");
                         i--;
                     }
@@ -681,12 +683,9 @@ namespace Game1
                     }
                     else if (powerUps[i].Type == "speedup")
                     {
-                        if (player.Speed == 5f)
-                        {
-                            player.Speed = 10f;
-                            speed = true;
-                        }
+                        speed = true;
                         powerUps.RemoveAt(i);
+                        speedTimer = timer + 5;
                         Console.WriteLine("PICKED UP SPEED");
                         i--;
                     }
@@ -694,6 +693,7 @@ namespace Game1
                     {
                         spread = true;
                         powerUps.RemoveAt(i);
+                        spreadTimer = timer + 7;
                         Console.WriteLine("PICKED UP SPREAD SHOT");
                         i--;
                     }
@@ -701,10 +701,21 @@ namespace Game1
                     {
                         bigShot = true;
                         powerUps.RemoveAt(i);
+                        bigShotTimer = timer + 7;
                         Console.WriteLine("PICKED UP BIG SHOT");
                         i--;
                     }
                 }
+            }
+
+            //speed change
+            if (speed == true && speedTimer > timer)
+            {
+                player.Speed = 10f;
+            }
+            else
+            {
+                player.Speed = 5f;
             }
 
             //testing filereader
