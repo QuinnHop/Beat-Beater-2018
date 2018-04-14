@@ -235,7 +235,7 @@ namespace Game1
             player.Texture = Content.Load<Texture2D>("PlayerSprite1");
             playerShield = Content.Load<Texture2D>("playerShield");
             hurtOverlay = Content.Load<Texture2D>("playerHurtOverlay");
-
+            character = Content.Load<Texture2D>("PlayerSprite1");
             enemyTexture = Content.Load<Texture2D>("EnemySprite");
             homingEnemyTexture = Content.Load<Texture2D>("HomingEnemySprite");
             pProjectileTexture = Content.Load<Texture2D>("PlayerProjectileSprite");
