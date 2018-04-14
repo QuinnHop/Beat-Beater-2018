@@ -14,13 +14,18 @@ namespace Game1
         protected float angle;
         protected bool toBeDeleted;
         string attackName;
+        float spawnTime;
         //properties
         public float Angle
         {
             get { return angle; }
             set { angle = value;}
         }
-
+        public float SpawnTimer
+        {
+            get { return spawnTime; }
+            set { spawnTime = value; }
+        }
         public bool ToBeDeleted
         {
             get { return toBeDeleted; }

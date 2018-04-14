@@ -120,6 +120,7 @@ namespace Game1
         private int collectRNG;
         //score
         private int bonusScore;
+        private double finalSongTime;
         //powerups
         PowerUps powerUp;
         private Texture2D shieldTexture;
@@ -317,11 +318,11 @@ namespace Game1
                     UpdateCredits(gameTime);
                     break;
                 case GameState.Paused:
+                    UpdatePaused(gameTime);
                     if (kbState.IsKeyDown(Keys.Space) && prevKbsState.IsKeyUp(Keys.Space))
                     {
                         gameState = GameState.InGame;
                         MediaPlayer.Resume();
-                        
                     }
                     break;
                 case GameState.LevelSelect:
@@ -340,7 +341,7 @@ namespace Game1
                         MediaPlayer.Pause();
                         gameState = GameState.Paused;
                     }
-                    if (reader.LevelComplete)
+                    if (reader.LevelComplete && enemies.Count == 0)
                     {
                         gameState = GameState.LevelComplete;
                     }
@@ -413,6 +414,18 @@ namespace Game1
             else if (back.checkPressed(mouse))
             {
                 gameState = GameState.MainMenu;
+            }
+        }
+        protected void UpdatePaused(GameTime gameTime)
+        {
+            if(pauseMenuButton.checkPressed(mouse)&& pauseMenuButton.checkPressed(prevMouseState) == false)
+            {
+                ResetLevel();
+                gameState = GameState.MainMenu;
+            }
+            else if (pauseQuitButton.checkPressed(mouse))
+            {
+                Exit();
             }
         }
         protected void UpdateCredits(GameTime gameTime)
@@ -505,16 +518,22 @@ namespace Game1
                 p.PositionY += (int)(p.Speed * Math.Sin(p.Angle));
             }
             //checks to enemy remove bullets out of bounds
-            for (int i = 0; i < enemies.Count - 1; i++)
+            for (int i = 0; i <= enemies.Count - 1; i++)
             {
                 if (enemies[i].CheckDelete(enemies[i].PositionX, enemies[i].PositionY))
                 {
                     enemies.RemoveAt(i);
                     i--;
                 }
+                else if (enemies[i].SpawnTimer <= timer && enemies[i].AttackName == "homing")
+                {
+                    enemies.RemoveAt(i);
+                    i--;
+                    Console.WriteLine("REMOVED HOMING SHOT");
+                }
             }
             //removes and damages player when enemy collides with it
-            for (int i = 0; i < enemies.Count - 1; i++)
+            for (int i = 0; i <= enemies.Count - 1; i++)
             {
              
                 if (enemies[i].CheckCollision(enemies[i], player))
@@ -583,19 +602,19 @@ namespace Game1
                 }
             }
             //processes player movement
-            if (kbState.IsKeyDown(Keys.D) && player.PositionX < GraphicsDevice.Viewport.Width - 100)//moves player left
+            if (kbState.IsKeyDown(Keys.D) && player.PositionX < GraphicsDevice.Viewport.Width -50)//moves player left
             {
                 player.PositionX += (int)player.Speed;
             }
-            if (kbState.IsKeyDown(Keys.A) && player.PositionX > 0)//moves player right
+            if (kbState.IsKeyDown(Keys.A) && player.PositionX > 0 +25)//moves player right
             {
                 player.PositionX -= (int)player.Speed;
             }
-            if (kbState.IsKeyDown(Keys.S) && player.PositionY < GraphicsDevice.Viewport.Height - 75)//moves player down
+            if (kbState.IsKeyDown(Keys.S) && player.PositionY < GraphicsDevice.Viewport.Height -25)//moves player down
             {
                 player.PositionY += (int)player.Speed;
             }
-            if (kbState.IsKeyDown(Keys.W) && player.PositionY > 0)//moves player up
+            if (kbState.IsKeyDown(Keys.W) && player.PositionY > 0 +50)//moves player up
             {
                 player.PositionY -= (int)player.Speed;
             }
@@ -744,6 +763,8 @@ namespace Game1
                     EnemyBullet Hbullet = new EnemyBullet((int)reader.xPosition, (int)reader.yPosition, 25, 25, 4);
                     Console.WriteLine("Bullet created at: " + Hbullet.PositionX + ", " + Hbullet.PositionY);
                     Console.WriteLine("Current reader time: " + reader.TimeStamp + ". Current Game time: " + timer);
+                    Hbullet.SpawnTimer = timer + 4;//sets time limit for how long the homing bullets will last
+                    Console.WriteLine("Current timer is: " + timer + " homing bullet should despawn at" + Hbullet.SpawnTimer);
                     reader.xPosition += rng.Next(25, 100);//spaces bullets out
                     reader.yPosition += rng.Next(25, 100);
                     Hbullet.Texture = homingEnemyTexture;
@@ -795,6 +816,7 @@ namespace Game1
                     if (player.Health <= 0) //Ends current game if player health is equal to or below 0
                     {
                         gameState = GameState.GameOver;
+                        finalSongTime = MediaPlayer.PlayPosition.TotalSeconds;
                     }
                     break;
                 case GameState.LevelComplete:
@@ -891,7 +913,8 @@ namespace Game1
         protected void DrawGameOver(GameTime gameTime)
         {
             spriteBatch.Draw(levelLost, new Rectangle(0, 0, 800, 800), Color.White);
-            spriteBatch.DrawString(spriteFont, MediaPlayer.PlayPosition.ToString(), new Vector2(300, 180), Color.Black);
+            spriteBatch.DrawString(spriteFont, Math.Round((music.Duration.TotalSeconds - finalSongTime)).ToString(), new Vector2(320, 150), Color.Black);
+            spriteBatch.DrawString(spriteFont, (Math.Round(timer + bonusScore, 0)).ToString(), new Vector2(325, 90), Color.Black);
             if (retryButton.checkHover(mouse))//checks if mouse is over start button
             {
                 spriteBatch.Draw(retry, retryButton.rectangle, Color.Green);
@@ -920,6 +943,7 @@ namespace Game1
             {
                 spriteBatch.Draw(levelCompleteBTexture, levelCompleteButton.rectangle, Color.White);
             }
+            spriteBatch.DrawString(spriteFont, (Math.Round(timer + bonusScore, 0)).ToString(), new Vector2(GraphicsDevice.Viewport.Width/2-20, 350), Color.Black);
         }
         protected void DrawPaused(GameTime gameTime)
         {
@@ -950,7 +974,7 @@ namespace Game1
             {
                 spriteBatch.Draw(hurtOverlay, new Rectangle(0, 0, 800, 800), Color.White);
             }
-            spriteBatch.DrawString(spriteFont, timer.ToString(), new Vector2(200, 40), Color.Black);
+            //spriteBatch.DrawString(spriteFont, timer.ToString(), new Vector2(200, 40), Color.Black);
             foreach(EnemyBullet en in enemies)
             {
                 spriteBatch.Draw(en.Texture, en.Position, null, Color.White, 
