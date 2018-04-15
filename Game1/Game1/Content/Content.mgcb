@@ -548,3 +548,9 @@
 /processorParam:TextureFormat=Color
 /build:SpeedPowerupSprite.png
 
+#begin Level1.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Level1.mp3
+

@@ -185,7 +185,7 @@ namespace Game1
             powerUps = new List<PowerUps>();
             kbState = Keyboard.GetState();
             mouse = Mouse.GetState();
-            level1 = string.Format("Content/test.txt");
+            level1 = string.Format("Content/Level 1.txt");
             
             gameState = GameState.MainMenu;
             bonusScore = 0;
@@ -237,6 +237,8 @@ namespace Game1
 
             //sounds
             playerHit = Content.Load<SoundEffect>("Crash");
+
+            //player and enemy sprites
             player.Texture = Content.Load<Texture2D>("PlayerSprite1");
             playerShield = Content.Load<Texture2D>("playerShield");
             hurtOverlay = Content.Load<Texture2D>("playerHurtOverlay");
@@ -329,6 +331,7 @@ namespace Game1
                     UpdateLevelSelect(gameTime);
                     break;
                 case GameState.InGame:
+                    finalSongTime = MediaPlayer.PlayPosition.TotalSeconds;
                     UpdateInGame(gameTime);
                     if (player.Health <= 0) //Ends current game if player health is equal to or below 0
                     {
@@ -386,7 +389,7 @@ namespace Game1
                 currentLevel = level1;
                 reader = new FileReader(level1);
                 reader.ReadLine();
-                music = Content.Load<Song>("Level1Song");
+                music = Content.Load<Song>("Level1");
                 MediaPlayer.Play(music);
                 gameState = GameState.InGame;
             }
@@ -447,6 +450,7 @@ namespace Game1
             else if (retryButton.checkPressed(mouse) && retryButton.checkPressed(prevMouseState) == false)
             {
                 ResetLevel();
+                MediaPlayer.Play(music);
                 reader = new FileReader(currentLevel);
                 gameState = GameState.InGame;
                 
@@ -469,6 +473,7 @@ namespace Game1
 
             if ((mouse.LeftButton == ButtonState.Pressed) && (prevMouseState.LeftButton == ButtonState.Released))//checks if player pressed space and fires a bullet
             {
+                bonusScore -= 10;//decreases score as penalty for shooting
                 if (spread == true && spreadTimer > timer)
                 {
                     PlayerProjectile p = new PlayerProjectile(player.PositionX, player.PositionY, 25, 25, 7.0f);
@@ -816,7 +821,7 @@ namespace Game1
                     if (player.Health <= 0) //Ends current game if player health is equal to or below 0
                     {
                         gameState = GameState.GameOver;
-                        finalSongTime = MediaPlayer.PlayPosition.TotalSeconds;
+                        
                     }
                     break;
                 case GameState.LevelComplete:
@@ -968,7 +973,6 @@ namespace Game1
         }
         protected void DrawInGame(GameTime gameTime)
         {
-            
             spriteBatch.DrawString(spriteFont, player.Health.ToString(), new Vector2(200, 20), Color.Black);
             if(hurtTimer > timer)
             {
