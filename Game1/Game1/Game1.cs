@@ -255,7 +255,7 @@ namespace Game1
             bigShotTexture = Content.Load<Texture2D>("BigPowerupSprite");
 
             //main menu
-            menuTexture = Content.Load<Texture2D>("MainMenu");
+            menuTexture = Content.Load<Texture2D>("menuFinalVersion");
             menuStartTexture = Content.Load<Texture2D>("PLAY");
             menuCreditsTexture = Content.Load<Texture2D>("CREDITS");
             menuQuitTexture = Content.Load<Texture2D>("QUIT");
@@ -314,24 +314,23 @@ namespace Game1
             switch (gameState)
             {
                 case GameState.MainMenu:
-                    UpdateMenu(gameTime);
+                    UpdateMenu(gameTime);//updates main menu screen
                     break;
                 case GameState.Credits:
-                    UpdateCredits(gameTime);
+                    UpdateCredits(gameTime);//updates credits screen
                     break;
                 case GameState.Paused:
                     UpdatePaused(gameTime);
-                    if (kbState.IsKeyDown(Keys.Space) && prevKbsState.IsKeyUp(Keys.Space))
+                    if (kbState.IsKeyDown(Keys.Space) && prevKbsState.IsKeyUp(Keys.Space))//unpauses music and resumes game
                     {
                         gameState = GameState.InGame;
                         MediaPlayer.Resume();
                     }
                     break;
                 case GameState.LevelSelect:
-                    UpdateLevelSelect(gameTime);
+                    UpdateLevelSelect(gameTime);//updates level select screen
                     break;
                 case GameState.InGame:
-                    finalSongTime = MediaPlayer.PlayPosition.TotalSeconds;
                     UpdateInGame(gameTime);
                     if (player.Health <= 0) //Ends current game if player health is equal to or below 0
                     {
@@ -368,15 +367,15 @@ namespace Game1
 
             //changes menu screens
             
-            if(menuStart.checkPressed(mouse) && menuStart.checkPressed(prevMouseState) == false)
+            if(menuStart.checkPressed(mouse) && menuStart.checkPressed(prevMouseState) == false)//when user hits play
             {
                 gameState = GameState.LevelSelect;
             }
-            if (menuCredits.checkPressed(mouse) && menuCredits.checkPressed(prevMouseState) == false)
+            if (menuCredits.checkPressed(mouse) && menuCredits.checkPressed(prevMouseState) == false)//when user hits credits
             {
                 gameState = GameState.Credits;
             }
-            if (menuQuit.checkPressed(mouse) && menuQuit.checkPressed(prevMouseState) == false)
+            if (menuQuit.checkPressed(mouse) && menuQuit.checkPressed(prevMouseState) == false)//when user hits quit
             {
                 Exit();
             }
@@ -469,7 +468,7 @@ namespace Game1
         {
             //angle calculations for player
             angle = (float)(Math.Atan2(mouse.Y - player.PositionY, mouse.X - player.PositionX));
-
+            finalSongTime = MediaPlayer.PlayPosition.TotalSeconds;//updates the player position in the song, ends when level ends
 
             if ((mouse.LeftButton == ButtonState.Pressed) && (prevMouseState.LeftButton == ButtonState.Released))//checks if player pressed space and fires a bullet
             {
@@ -912,6 +911,11 @@ namespace Game1
         }
         protected void DrawCredits(GameTime gameTime)
         {
+            //draws credits to the screen
+            spriteBatch.DrawString(spriteFont, "Quinn: Architecture and Menus", new Vector2(50, 50), Color.Black);
+            spriteBatch.DrawString(spriteFont, "Drew: Design and Collectables", new Vector2(50, 250), Color.Black);
+            spriteBatch.DrawString(spriteFont, "Gabriel: Production and in game art", new Vector2(50, 450), Color.Black);
+            spriteBatch.DrawString(spriteFont, "Level 1 song: 'Iguana' by Qusic", new Vector2(50, 650), Color.Black);
             GraphicsDevice.Clear(Color.AliceBlue);
             spriteBatch.Draw(backTexture, back.rectangle, Color.White);
         }
