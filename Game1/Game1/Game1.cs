@@ -624,7 +624,7 @@ namespace Game1
             }
             //collectable spawn
             rng = new Random();
-            collectRNG = rng.Next(1000);
+            collectRNG = rng.Next(600);
             if(collectRNG == 10)
             {
                 collectable = new Collectable(rng.Next(GraphicsDevice.Viewport.Width), rng.Next(GraphicsDevice.Viewport.Height), 25, 25, 0);
@@ -643,7 +643,7 @@ namespace Game1
             }
             //powerup spawn
             rng = new Random();
-            powerRNG = rng.Next(1000);
+            powerRNG = rng.Next(800);
             if(powerRNG == 10)
             {
                 powerRNG = rng.Next(5);
