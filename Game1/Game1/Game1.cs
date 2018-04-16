@@ -472,7 +472,7 @@ namespace Game1
 
             if ((mouse.LeftButton == ButtonState.Pressed) && (prevMouseState.LeftButton == ButtonState.Released))//checks if player pressed space and fires a bullet
             {
-                bonusScore -= 10;//decreases score as penalty for shooting
+                //bonusScore -= 10;//decreases score as penalty for shooting
                 if (spread == true && spreadTimer > timer)
                 {
                     PlayerProjectile p = new PlayerProjectile(player.PositionX, player.PositionY, 25, 25, 7.0f);
