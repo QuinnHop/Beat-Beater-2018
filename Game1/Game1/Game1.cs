@@ -913,10 +913,11 @@ namespace Game1
         {
             //draws credits to the screen
             spriteBatch.DrawString(spriteFont, "Quinn: Architecture and Menus", new Vector2(50, 50), Color.Black);
-            spriteBatch.DrawString(spriteFont, "Drew: Design and Collectables", new Vector2(50, 250), Color.Black);
-            spriteBatch.DrawString(spriteFont, "Gabriel: Production and in game art", new Vector2(50, 450), Color.Black);
-            spriteBatch.DrawString(spriteFont, "Level 1 song: 'Iguana' by Qusic", new Vector2(50, 650), Color.Black);
-            GraphicsDevice.Clear(Color.AliceBlue);
+            spriteBatch.DrawString(spriteFont, "Drew: Design and Collectables", new Vector2(50, 200), Color.Black);
+            spriteBatch.DrawString(spriteFont, "Gabriel: Production and in game art", new Vector2(50, 350), Color.Black);
+            spriteBatch.DrawString(spriteFont, "Level 1 song: 'Iguana' by Qusic", new Vector2(50, 500), Color.Black);
+            spriteBatch.DrawString(spriteFont, "Fisher: Concept", new Vector2(50, 650), Color.Black);
+            GraphicsDevice.Clear(Color.Snow);
             spriteBatch.Draw(backTexture, back.rectangle, Color.White);
         }
         protected void DrawGameOver(GameTime gameTime)
