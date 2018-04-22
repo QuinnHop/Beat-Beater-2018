@@ -651,7 +651,7 @@ namespace Game1
             }
             //powerup spawn
             rng = new Random();
-            powerRNG = rng.Next(1000);
+            powerRNG = rng.Next(800);
             if(powerRNG == 10)
             {
                 powerRNG = rng.Next(5);
