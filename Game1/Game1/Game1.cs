@@ -144,6 +144,9 @@ namespace Game1
         public bool Spread { get { return spread; }  set { spread = value; } }
         public bool BigShot { get { return bigShot; }  set { bigShot = value; } }
 
+        //timer after getting shot
+        private float shotTimer = 0f;
+
 
 
         //sounds
@@ -509,7 +512,7 @@ namespace Game1
 
 
             //creates bullets
-
+            
             timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
             foreach (EnemyBullet en in enemies)//moves enemy bullets
             {
@@ -540,7 +543,6 @@ namespace Game1
             //removes and damages player when enemy collides with it
             for (int i = 0; i <= enemies.Count - 1; i++)
             {
-             
                 if (enemies[i].CheckCollision(enemies[i], player))
                 {
                     enemies.RemoveAt(i);
@@ -549,11 +551,16 @@ namespace Game1
                     {
                         shield = false;
                     }
+                    else if(shotTimer > timer)
+                    {
+                        //does nothing
+                    }
                     else
                     {
                         player.Health--;
                         playerHit.Play();//plays hit sound effect
                         hurtTimer = timer + 1.05f;
+                        shotTimer = timer + 1.5f;
                     }
                 }
             }
@@ -625,7 +632,7 @@ namespace Game1
             }
             //collectable spawn
             rng = new Random();
-            collectRNG = rng.Next(1000);
+            collectRNG = rng.Next(600);
             if(collectRNG == 10)
             {
                 collectable = new Collectable(rng.Next(GraphicsDevice.Viewport.Width), rng.Next(GraphicsDevice.Viewport.Height), 25, 25, 0);
@@ -644,7 +651,7 @@ namespace Game1
             }
             //powerup spawn
             rng = new Random();
-            powerRNG = rng.Next(1000);
+            powerRNG = rng.Next(800);
             if(powerRNG == 10)
             {
                 powerRNG = rng.Next(5);
@@ -1041,6 +1048,7 @@ namespace Game1
             bigShot = false;
             timer = 0;
             hurtTimer = 0;
+            shotTimer = 0;
             player.Texture = character;
             while (enemies.Count > 0)//deletes enemy projectiles
             {
