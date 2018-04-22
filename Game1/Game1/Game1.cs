@@ -144,6 +144,9 @@ namespace Game1
         public bool Spread { get { return spread; }  set { spread = value; } }
         public bool BigShot { get { return bigShot; }  set { bigShot = value; } }
 
+        //timer after getting shot
+        private float shotTimer = 0f;
+
 
 
         //sounds
@@ -472,6 +475,7 @@ namespace Game1
 
             if ((mouse.LeftButton == ButtonState.Pressed) && (prevMouseState.LeftButton == ButtonState.Released))//checks if player pressed space and fires a bullet
             {
+
                 //bonusScore -= 10;//decreases score as penalty for shooting
                 if (spread == true && spreadTimer > timer)
                 {
@@ -508,7 +512,7 @@ namespace Game1
 
 
             //creates bullets
-
+            
             timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
             foreach (EnemyBullet en in enemies)//moves enemy bullets
             {
@@ -539,7 +543,6 @@ namespace Game1
             //removes and damages player when enemy collides with it
             for (int i = 0; i <= enemies.Count - 1; i++)
             {
-             
                 if (enemies[i].CheckCollision(enemies[i], player))
                 {
                     enemies.RemoveAt(i);
@@ -548,11 +551,16 @@ namespace Game1
                     {
                         shield = false;
                     }
+                    else if(shotTimer > timer)
+                    {
+                        //does nothing
+                    }
                     else
                     {
                         player.Health--;
                         playerHit.Play();//plays hit sound effect
                         hurtTimer = timer + 1.05f;
+                        shotTimer = timer + 1.5f;
                     }
                 }
             }
@@ -624,7 +632,7 @@ namespace Game1
             }
             //collectable spawn
             rng = new Random();
-            collectRNG = rng.Next(1000);
+            collectRNG = rng.Next(600);
             if(collectRNG == 10)
             {
                 collectable = new Collectable(rng.Next(GraphicsDevice.Viewport.Width), rng.Next(GraphicsDevice.Viewport.Height), 25, 25, 0);
@@ -978,7 +986,7 @@ namespace Game1
         }
         protected void DrawInGame(GameTime gameTime)
         {
-            spriteBatch.DrawString(spriteFont, player.Health.ToString(), new Vector2(200, 20), Color.Black);
+            
             if(hurtTimer > timer)
             {
                 spriteBatch.Draw(hurtOverlay, new Rectangle(0, 0, 800, 800), Color.White);
@@ -1040,6 +1048,7 @@ namespace Game1
             bigShot = false;
             timer = 0;
             hurtTimer = 0;
+            shotTimer = 0;
             player.Texture = character;
             while (enemies.Count > 0)//deletes enemy projectiles
             {
