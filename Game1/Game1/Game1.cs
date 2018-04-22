@@ -244,7 +244,7 @@ namespace Game1
             //player and enemy sprites
             player.Texture = Content.Load<Texture2D>("PlayerSprite1");
             playerShield = Content.Load<Texture2D>("playerShield");
-            hurtOverlay = Content.Load<Texture2D>("playerHurtOverlay");
+            hurtOverlay = Content.Load<Texture2D>("playerHurtOverlayFinal");
             character = Content.Load<Texture2D>("PlayerSprite1");
             enemyTexture = Content.Load<Texture2D>("EnemySprite");
             homingEnemyTexture = Content.Load<Texture2D>("HomingEnemySprite");
@@ -560,7 +560,7 @@ namespace Game1
                         player.Health--;
                         playerHit.Play();//plays hit sound effect
                         hurtTimer = timer + 1.05f;
-                        shotTimer = timer + 1.5f;
+                        shotTimer = timer + 1.05f;
                     }
                 }
             }
