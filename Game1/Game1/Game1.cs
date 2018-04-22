@@ -472,6 +472,7 @@ namespace Game1
 
             if ((mouse.LeftButton == ButtonState.Pressed) && (prevMouseState.LeftButton == ButtonState.Released))//checks if player pressed space and fires a bullet
             {
+
                 //bonusScore -= 10;//decreases score as penalty for shooting
                 if (spread == true && spreadTimer > timer)
                 {
@@ -978,7 +979,7 @@ namespace Game1
         }
         protected void DrawInGame(GameTime gameTime)
         {
-            spriteBatch.DrawString(spriteFont, player.Health.ToString(), new Vector2(200, 20), Color.Black);
+            
             if(hurtTimer > timer)
             {
                 spriteBatch.Draw(hurtOverlay, new Rectangle(0, 0, 800, 800), Color.White);
