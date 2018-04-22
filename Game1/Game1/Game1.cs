@@ -45,6 +45,7 @@ namespace Game1
         Texture2D hurtOverlay;
         //font
         private SpriteFont spriteFont;
+        private SpriteFont finalScoreSpriteFont;
         private Vector2 fontVector = new Vector2(350, 0);
 
         //menu buttons
@@ -237,7 +238,7 @@ namespace Game1
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             spriteFont = Content.Load<SpriteFont>("FontFile");
-
+            finalScoreSpriteFont = Content.Load<SpriteFont>("FinalScoreFont");
             //sounds
             playerHit = Content.Load<SoundEffect>("Crash");
 
@@ -614,19 +615,19 @@ namespace Game1
                 }
             }
             //processes player movement
-            if (kbState.IsKeyDown(Keys.D) && player.PositionX < GraphicsDevice.Viewport.Width -50)//moves player left
+            if (kbState.IsKeyDown(Keys.D) && player.PositionX < GraphicsDevice.Viewport.Width -35)//moves player left
             {
                 player.PositionX += (int)player.Speed;
             }
-            if (kbState.IsKeyDown(Keys.A) && player.PositionX > 0 +25)//moves player right
+            if (kbState.IsKeyDown(Keys.A) && player.PositionX > 0 +35)//moves player right
             {
                 player.PositionX -= (int)player.Speed;
             }
-            if (kbState.IsKeyDown(Keys.S) && player.PositionY < GraphicsDevice.Viewport.Height -25)//moves player down
+            if (kbState.IsKeyDown(Keys.S) && player.PositionY < GraphicsDevice.Viewport.Height -35)//moves player down
             {
                 player.PositionY += (int)player.Speed;
             }
-            if (kbState.IsKeyDown(Keys.W) && player.PositionY > 0 +50)//moves player up
+            if (kbState.IsKeyDown(Keys.W) && player.PositionY > 0 +35)//moves player up
             {
                 player.PositionY -= (int)player.Speed;
             }
@@ -635,7 +636,7 @@ namespace Game1
             collectRNG = rng.Next(600);
             if(collectRNG == 10)
             {
-                collectable = new Collectable(rng.Next(GraphicsDevice.Viewport.Width), rng.Next(GraphicsDevice.Viewport.Height), 25, 25, 0);
+                collectable = new Collectable(rng.Next(35, GraphicsDevice.Viewport.Width-35), rng.Next(35, GraphicsDevice.Viewport.Height -35), 25, 25, 0);
                 collectable.Texture = collectTexture;
                 collectables.Add(collectable);
             }
@@ -961,7 +962,8 @@ namespace Game1
             {
                 spriteBatch.Draw(levelCompleteBTexture, levelCompleteButton.rectangle, Color.White);
             }
-            spriteBatch.DrawString(spriteFont, (Math.Round(timer + bonusScore, 0)).ToString(), new Vector2(GraphicsDevice.Viewport.Width/2-20, 350), Color.Black);
+            spriteBatch.DrawString(finalScoreSpriteFont
+                , (Math.Round(timer + bonusScore, 0)).ToString(), new Vector2(GraphicsDevice.Viewport.Width/2-75, 350), Color.Black);
         }
         protected void DrawPaused(GameTime gameTime)
         {

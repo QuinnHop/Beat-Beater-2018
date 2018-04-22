@@ -578,3 +578,10 @@
 /processorParam:TextureFormat=Color
 /build:playerHurtOverlayFinal.png
 
+#begin FinalScoreFont.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:FinalScoreFont.spritefont
+
