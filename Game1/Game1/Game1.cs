@@ -84,6 +84,7 @@ namespace Game1
         private List<EnemyBullet> enemies;
         private Texture2D enemyTexture;
         private Texture2D homingEnemyTexture;
+        private Texture2D enemyExplosionTexture;
         public float timer;
         public float hurtTimer;
       
@@ -249,6 +250,7 @@ namespace Game1
             character = Content.Load<Texture2D>("PlayerSprite1");
             enemyTexture = Content.Load<Texture2D>("EnemySprite");
             homingEnemyTexture = Content.Load<Texture2D>("HomingEnemySprite");
+            enemyExplosionTexture = Content.Load<Texture2D>("BulletExplosion");
             pProjectileTexture = Content.Load<Texture2D>("PlayerProjectileSprite");
 
             collectTexture = Content.Load<Texture2D>("CoinSprite");

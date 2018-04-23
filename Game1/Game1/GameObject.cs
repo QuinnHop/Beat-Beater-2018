@@ -12,6 +12,8 @@ namespace Game1
     {
         //fields
         protected Rectangle position;
+        protected SpriteBatch spriteBatch;
+        protected GraphicsDevice newGraphicsDevice = new GraphicsDevice(GraphicsAdapter.DefaultAdapter, GraphicsProfile.HiDef, new PresentationParameters());
         protected Texture2D texture;
         protected float speed;
 
@@ -62,6 +64,7 @@ namespace Game1
         public GameObject(int x, int y, int height, int width, float speed)
         {
             position = new Rectangle(x, y, width, height);
+            spriteBatch = new SpriteBatch(newGraphicsDevice);
         }
         
         //methods
