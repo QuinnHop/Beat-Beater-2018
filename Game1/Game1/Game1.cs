@@ -113,7 +113,10 @@ namespace Game1
         string level2;
         string level3;
         string level4;
-        string level5;
+        private bool l1;
+        private bool l2;
+        private bool l3;
+        private bool l4;
 
         //collectables
         Collectable collectable;
@@ -396,6 +399,10 @@ namespace Game1
                 reader.ReadLine();
                 music = Content.Load<Song>("Level1");
                 MediaPlayer.Play(music);
+                l1 = true;
+                l2 = false;
+                l3 = false;
+                l4 = false;
                 gameState = GameState.InGame;
             }
             else if (level2Button.checkPressed(mouse) && level2Button.checkPressed(prevMouseState) == false)
@@ -403,6 +410,10 @@ namespace Game1
                 currentLevel = level2;
                 reader = new FileReader(level2);
                 reader.ReadLine();
+                l1 = false;
+                l2 = true;
+                l3 = false;
+                l4 = false;
                 gameState = GameState.InGame;
             }
             else if (level3Button.checkPressed(mouse) && level3Button.checkPressed(prevMouseState) == false)
@@ -410,6 +421,10 @@ namespace Game1
                 currentLevel = level3;
                 reader = new FileReader(level3);
                 reader.ReadLine();
+                l1 = false;
+                l2 = false;
+                l3 = true;
+                l4 = false;
                 gameState = GameState.InGame;
             }
             else if (level4Button.checkPressed(mouse) && level4Button.checkPressed(prevMouseState) == false)
@@ -417,6 +432,10 @@ namespace Game1
                 currentLevel = level4;
                 reader = new FileReader(level4);
                 reader.ReadLine();
+                l1 = false;
+                l2 = false;
+                l3 = false;
+                l4 = true;
                 gameState = GameState.InGame;
             }
             else if (back.checkPressed(mouse))
@@ -828,6 +847,23 @@ namespace Game1
                     break;
                 case GameState.InGame:
                     DrawInGame(gameTime);
+                    //draw background color
+                    if (l1 == true)
+                    {
+                        GraphicsDevice.Clear(Color.Lavender);
+                    }
+                    else if (l2 == true)
+                    {
+                        GraphicsDevice.Clear(Color.SeaShell);
+                    }
+                    else if (l3 == true)
+                    {
+                        GraphicsDevice.Clear(Color.MediumTurquoise);
+                    }
+                    else if (l4 == true)
+                    {
+                        GraphicsDevice.Clear(Color.DarkOliveGreen);
+                    }
                     if (player.Health <= 0) //Ends current game if player health is equal to or below 0
                     {
                         gameState = GameState.GameOver;
@@ -1021,7 +1057,9 @@ namespace Game1
                 spriteBatch.Draw(playerShield, new Rectangle(player.PositionX-50, player.PositionY-50, 128, 128), Color.White);
             }
             else { shield = false; }
+
             
+
             //this is the drawing of the player overloads are as follows:
             //player.Texture: the texture to load
             //player.position: The rectangle it derives it's position from
