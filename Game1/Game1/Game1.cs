@@ -82,6 +82,7 @@ namespace Game1
 
         //enemy bullets
         private List<EnemyBullet> enemies;
+        private List<DestroyedBullet> destroyedEnemies;
         private Texture2D enemyTexture;
         private Texture2D homingEnemyTexture;
         private Texture2D enemyExplosionTexture;
@@ -189,6 +190,7 @@ namespace Game1
             player = new Player(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2, 75, 100, 5.0f);
             pProjects = new List<PlayerProjectile>();
             enemies = new List<EnemyBullet>();
+            destroyedEnemies = new List<DestroyedBullet>();
             collectables = new List<Collectable>();
             powerUps = new List<PowerUps>();
             kbState = Keyboard.GetState();
@@ -620,6 +622,8 @@ namespace Game1
                 {
                     if (p.CheckCollision(p, enemies[i]))
                     {
+                        destroyedEnemies.Add(new DestroyedBullet(enemies[i].Position, enemyExplosionTexture));
+                        destroyedEnemies[destroyedEnemies.Count - 1].AppearTimer =  this.timer + 1.05f;
                         enemies.RemoveAt(i);
                         i--;
                         
@@ -1037,6 +1041,13 @@ namespace Game1
                 spriteBatch.Draw(en.Texture, en.Position, null, Color.White, 
                     (float)(en.Angle + Math.PI), new Vector2(en.Width/2, en.Height/2),
                     SpriteEffects.None, 0);
+            }
+            foreach(DestroyedBullet b in destroyedEnemies)
+            {
+                if (b.AppearTimer > timer)
+                {
+                    spriteBatch.Draw(b.Texture, b.Rectangle, Color.White);
+                }
             }
             foreach (PlayerProjectile p in pProjects)
             {
