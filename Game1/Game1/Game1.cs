@@ -72,6 +72,7 @@ namespace Game1
         //credits
         private Button back;
         private Texture2D backTexture;
+        private Texture2D creditsTexture;
 
         //pause menu
         private Texture2D pauseTexture;
@@ -214,7 +215,7 @@ namespace Game1
             
             //credits button
             back = new Button(new Rectangle(575, 710, 225, 100));
-
+            creditsTexture = Content.Load<Texture2D>("creditsv2");
             //Game over - level lost
             retryButton = new Button(new Rectangle(71, 570, 263, 134));
             returnToMenuButton = new Button(new Rectangle(464, 570, 263, 134));
@@ -271,7 +272,7 @@ namespace Game1
             menuCreditsTexture = Content.Load<Texture2D>("CREDITS");
             menuQuitTexture = Content.Load<Texture2D>("QUIT");
             //level select
-            levelSelectTexture = Content.Load<Texture2D>("level selec bright version");
+            levelSelectTexture = Content.Load<Texture2D>("levleSelectFinal");
             level1Texture = Content.Load<Texture2D>("SONG 1");
             level2Texture = Content.Load<Texture2D>("SONG 2");
             level3Texture = Content.Load<Texture2D>("SONG 3");
@@ -963,12 +964,7 @@ namespace Game1
         protected void DrawCredits(GameTime gameTime)
         {
             //draws credits to the screen
-            spriteBatch.DrawString(spriteFont, "Quinn: Architecture and Menus", new Vector2(50, 50), Color.Black);
-            spriteBatch.DrawString(spriteFont, "Drew: Design and Collectables", new Vector2(50, 200), Color.Black);
-            spriteBatch.DrawString(spriteFont, "Gabriel: Production and in game art", new Vector2(50, 350), Color.Black);
-            spriteBatch.DrawString(spriteFont, "Level 1 song: 'Iguana' by Qusic", new Vector2(50, 500), Color.Black);
-            spriteBatch.DrawString(spriteFont, "Fisher: Concept", new Vector2(50, 650), Color.Black);
-            GraphicsDevice.Clear(Color.Snow);
+            spriteBatch.Draw(creditsTexture, new Rectangle(0, 0, 800, 800), Color.White);
             spriteBatch.Draw(backTexture, back.rectangle, Color.White);
         }
         protected void DrawGameOver(GameTime gameTime)
@@ -1103,6 +1099,10 @@ namespace Game1
             hurtTimer = 0;
             shotTimer = 0;
             player.Texture = character;
+            while(destroyedEnemies.Count > 0)
+            {
+                destroyedEnemies.RemoveAt(0);
+            }
             while (enemies.Count > 0)//deletes enemy projectiles
             {
                 enemies.RemoveAt(0);
@@ -1119,60 +1119,12 @@ namespace Game1
             {
                 pProjects.RemoveAt(0);
             }
-            while (powerUps.Count > 0)//deletes player projectiles
-            {
-                powerUps.RemoveAt(0);
-            }
+            
             ResetElapsedTime();
             
         }
         
-        //bullet spawner
-        /*
-        public void BulletSpawner()
-        {
-            if(enemies.Count < 10)
-            {
-                //determine area to spawn in
-                spawnDirection = rng.Next(1, 5);
-                
-                if(spawnDirection == 1)//spawns above the screen
-                {
-                    int randomX = rng.Next(10, GraphicsDevice.Viewport.Width);  //spawns above
-                    EnemyBullet enemy = new EnemyBullet(randomX, -100, 20, 20, 6.0f);
-                    enemy.Texture = enemyTexture;
-                    enemy.Angle = enemy.FindAngle(enemy, player);
-                    enemies.Add(enemy);
-                }
-                if(spawnDirection == 2)//spawns to the right of the screen
-                {
-                    int randomY = rng.Next(10, GraphicsDevice.Viewport.Height);//spawns to the right
-                    EnemyBullet enemy = new EnemyBullet(GraphicsDevice.Viewport.Width +100, randomY, 20, 20, 6.0f);
-                    enemy.Texture = enemyTexture;
-                    enemy.Angle = enemy.FindAngle(enemy, player);
-                    enemies.Add(enemy);
-                }
-                if(spawnDirection == 3)//spawns below the screen
-                {
-                    int randomX = rng.Next(10, GraphicsDevice.Viewport.Width);//spawns below
-                    EnemyBullet enemy = new EnemyBullet(randomX, GraphicsDevice.Viewport.Height + 100, 20, 20, 6.0f);
-                    enemy.Texture = enemyTexture;
-                    enemy.Angle = enemy.FindAngle(enemy, player);
-                    enemies.Add(enemy);
-                }
-                if(spawnDirection == 4)//spawns to the left of the screen
-                {
-                    int randomY = rng.Next(10, GraphicsDevice.Viewport.Height);//spawns to the left
-                    EnemyBullet enemy = new EnemyBullet(-100, randomY, 20, 20, 6.0f);
-                    enemy.Texture = enemyTexture;
-                    enemy.Angle = enemy.FindAngle(enemy, player);
-                    enemies.Add(enemy);
-                }
-                
-            }
-       
-         }
-         */
+        
         
     }
 }
