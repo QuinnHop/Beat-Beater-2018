@@ -111,6 +111,7 @@ namespace Game1
         //level information
         FileReader reader;
         string currentLevel;
+        int bpm;
         string level1;
         string level2;
         string level3;
@@ -200,6 +201,9 @@ namespace Game1
             kbState = Keyboard.GetState();
             mouse = Mouse.GetState();
             level1 = string.Format("Content/Level 1.txt");
+            level2 = string.Format("Content/Level 2.txt");
+            level3 = string.Format("Content/Level 3.txt");
+            level4 = string.Format("Content/Level 4.txt");
             
             gameState = GameState.MainMenu;
             bonusScore = 0;
@@ -413,6 +417,7 @@ namespace Game1
                 reader.ReadLine();
                 music = Content.Load<Song>("Level1");
                 MediaPlayer.Play(music);
+                bpm = 110;
                 l1 = true;
                 l2 = false;
                 l3 = false;
@@ -425,6 +430,9 @@ namespace Game1
                 currentLevel = level2;
                 reader = new FileReader(level2);
                 reader.ReadLine();
+                music = Content.Load<Song>("Level2");
+                MediaPlayer.Play(music);
+                bpm = 100;
                 l1 = false;
                 l2 = true;
                 l3 = false;
@@ -580,12 +588,13 @@ namespace Game1
                     enemies.RemoveAt(i);
                     i--;
                 }
-                else if (enemies[i].SpawnTimer <= timer && enemies[i].AttackName == "homing")
-                {
-                    enemies.RemoveAt(i);
-                    i--;
-                    Console.WriteLine("REMOVED HOMING SHOT");
-                }
+                //else if (enemies[i].SpawnTimer <= timer && enemies[i].AttackName == "homing")
+                //{
+                //    enemies.RemoveAt(i);
+                //    i--;
+                //    Console.WriteLine("REMOVED HOMING SHOT");
+                //}
+                //   --changed behaviour to stop homing and fly straight after time limit
             }
             //removes and damages player when enemy collides with it
             for (int i = 0; i <= enemies.Count - 1; i++)
@@ -632,7 +641,7 @@ namespace Game1
 
             foreach(EnemyBullet en in enemies)
             {
-                if(en.AttackName == "homing")
+                if(en.AttackName == "homing" && en.SpawnTimer >= timer)
                 {
                     en.Angle = (en.FindAngle(en, player));
                 }
@@ -802,7 +811,7 @@ namespace Game1
 
             //testing filereader
 
-            if (timer >= reader.TimeStamp && reader.LevelComplete == false)
+            if (timer >= (float)reader.TimeStamp * (float)(60.0 / bpm) && reader.LevelComplete == false)
             {
                 Console.WriteLine(reader.TimeStamp + " " + reader.AttackName
                     + " " + reader.NumberOfAttacks + " " + reader.xPosition + " " + reader.yPosition);
@@ -821,15 +830,115 @@ namespace Game1
                         enemies.Add(bullet);
                     }
                 }
-                else if (reader.AttackName == " homing")//spawns homing bullets
+                if (reader.AttackName == " random")//spawns basic enemy bullet randomly
+                {
+                    int dist = rng.Next(-20,820);
+                    int side = rng.Next(1,4);
+                    switch (side) {
+                        case 1:
+                            reader.xPosition = dist;
+                            reader.yPosition = -20;
+                            break;
+                        case 2:
+                            reader.xPosition = dist;
+                            reader.yPosition = 820;
+                            break;
+                        case 3:
+                            reader.xPosition = -20;
+                            reader.yPosition = dist;
+                            break;
+                        case 4:
+                            reader.xPosition = 820;
+                            reader.yPosition = dist;
+                            break;
+                    }
+                    for(int i = 0; i < reader.NumberOfAttacks; i++)
+                    {
+                        EnemyBullet bullet = new EnemyBullet((int)reader.xPosition, (int)reader.yPosition, 25, 25, 6);
+                        Console.WriteLine("Bullet created at: " + bullet.PositionX + ", " + bullet.PositionY);
+                        Console.WriteLine("Current reader time: " + reader.TimeStamp + ". Current Game time: " + timer);
+                        reader.xPosition += rng.Next(-30, 30);//spaces bullets out
+                        reader.yPosition += rng.Next(-30, 30);
+                        bullet.Texture = enemyTexture;
+                        bullet.Angle = bullet.FindAngle(bullet, player) + (float)((rng.NextDouble()-.5)*.25);
+                        bullet.AttackName = "basic";
+                        enemies.Add(bullet);
+                    }
+                }
+                else if (reader.AttackName == " line")//spawns a line of bullets
+                {
+                    float dir;
+                    int offsetY;
+                    int offsetX;
+                    if (reader.yPosition < 0) {
+                        dir = (float)Math.PI * 1 / 2; //down
+                        offsetX = -40;
+                        offsetY = 0;
+                    } else if (reader.xPosition < 0) {
+                        dir = 0; //right
+                        offsetX = 0;
+                        offsetY = 40;
+                    } else if (reader.yPosition > 800) {
+                        dir = (float)Math.PI * 3 / 2; //up
+                        offsetX = 40;
+                        offsetY = 0;
+                    } else {
+                        dir = (float)Math.PI; //left
+                        offsetX = 0;
+                        offsetY = -40;
+                    }
+                    for(int i = 0; i < reader.NumberOfAttacks; i++)
+                    {
+                        EnemyBullet bullet = new EnemyBullet((int)reader.xPosition, (int)reader.yPosition, 25, 25, 6);
+                        Console.WriteLine("Bullet created at: " + bullet.PositionX + ", " + bullet.PositionY);
+                        Console.WriteLine("Current reader time: " + reader.TimeStamp + ". Current Game time: " + timer);
+                        reader.xPosition += offsetX;//spaces bullets out
+                        reader.yPosition += offsetY;
+                        bullet.Angle = dir;
+                        bullet.Texture = enemyTexture;
+                        bullet.AttackName = "basic";
+                        enemies.Add(bullet);
+                    }
+                }
+                else if (reader.AttackName == " homing")//spawns homing bullet
                 {
                     EnemyBullet Hbullet = new EnemyBullet((int)reader.xPosition, (int)reader.yPosition, 25, 25, 4);
                     Console.WriteLine("Bullet created at: " + Hbullet.PositionX + ", " + Hbullet.PositionY);
                     Console.WriteLine("Current reader time: " + reader.TimeStamp + ". Current Game time: " + timer);
                     Hbullet.SpawnTimer = timer + 4;//sets time limit for how long the homing bullets will last
                     Console.WriteLine("Current timer is: " + timer + " homing bullet should despawn at" + Hbullet.SpawnTimer);
-                    reader.xPosition += rng.Next(25, 100);//spaces bullets out
-                    reader.yPosition += rng.Next(25, 100);
+                    Hbullet.Texture = homingEnemyTexture;
+                    Hbullet.Angle = Hbullet.FindAngle(Hbullet, player);
+                    Hbullet.AttackName = "homing";
+                    enemies.Add(Hbullet);
+                }
+                else if (reader.AttackName == " randhoming")//spawns homing bullet
+                {
+                    int dist = rng.Next(-20,820);
+                    int side = rng.Next(1,4);
+                    switch (side) {
+                        case 1:
+                            reader.xPosition = dist;
+                            reader.yPosition = -20;
+                            break;
+                        case 2:
+                            reader.xPosition = dist;
+                            reader.yPosition = 820;
+                            break;
+                        case 3:
+                            reader.xPosition = -20;
+                            reader.yPosition = dist;
+                            break;
+                        case 4:
+                            reader.xPosition = 820;
+                            reader.yPosition = dist;
+                            break;
+                    }
+                    EnemyBullet Hbullet = new EnemyBullet((int)reader.xPosition, (int)reader.yPosition, 25, 25, 4);
+                    Console.WriteLine("Bullet created at: " + Hbullet.PositionX + ", " + Hbullet.PositionY);
+                    Console.WriteLine("Current reader time: " + reader.TimeStamp + ". Current Game time: " + timer);
+                    Hbullet.SpawnTimer = timer + 4;//sets time limit for how long the homing bullets will last
+                    Console.WriteLine("Current timer is: " + timer + " homing bullet should despawn at" + Hbullet.SpawnTimer);
                     Hbullet.Texture = homingEnemyTexture;
                     Hbullet.Angle = Hbullet.FindAngle(Hbullet, player);
                     Hbullet.AttackName = "homing";
