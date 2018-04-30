@@ -72,6 +72,7 @@ namespace Game1
         //credits
         private Button back;
         private Texture2D backTexture;
+        private Texture2D creditsTexture;
 
         //pause menu
         private Texture2D pauseTexture;
@@ -82,6 +83,7 @@ namespace Game1
 
         //enemy bullets
         private List<EnemyBullet> enemies;
+        private List<DestroyedBullet> destroyedEnemies;
         private Texture2D enemyTexture;
         private Texture2D homingEnemyTexture;
         private Texture2D enemyExplosionTexture;
@@ -109,6 +111,7 @@ namespace Game1
         //level information
         FileReader reader;
         string currentLevel;
+        int bpm;
         string level1;
         string level2;
         string level3;
@@ -157,6 +160,9 @@ namespace Game1
         //sounds
         SoundEffect playerHit;
         SoundEffect collectableGotten;
+        SoundEffect playerShot;
+        SoundEffect menuPress;
+        SoundEffect bulletHit;
 
         Song music;
 
@@ -189,11 +195,15 @@ namespace Game1
             player = new Player(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2, 75, 100, 5.0f);
             pProjects = new List<PlayerProjectile>();
             enemies = new List<EnemyBullet>();
+            destroyedEnemies = new List<DestroyedBullet>();
             collectables = new List<Collectable>();
             powerUps = new List<PowerUps>();
             kbState = Keyboard.GetState();
             mouse = Mouse.GetState();
             level1 = string.Format("Content/Level 1.txt");
+            level2 = string.Format("Content/Level 2.txt");
+            level3 = string.Format("Content/Level 3.txt");
+            level4 = string.Format("Content/Level 4.txt");
             
             gameState = GameState.MainMenu;
             bonusScore = 0;
@@ -212,7 +222,7 @@ namespace Game1
             
             //credits button
             back = new Button(new Rectangle(575, 710, 225, 100));
-
+            creditsTexture = Content.Load<Texture2D>("creditsv2");
             //Game over - level lost
             retryButton = new Button(new Rectangle(71, 570, 263, 134));
             returnToMenuButton = new Button(new Rectangle(464, 570, 263, 134));
@@ -244,7 +254,11 @@ namespace Game1
             spriteFont = Content.Load<SpriteFont>("FontFile");
             finalScoreSpriteFont = Content.Load<SpriteFont>("FinalScoreFont");
             //sounds
-            playerHit = Content.Load<SoundEffect>("Crash");
+            playerHit = Content.Load<SoundEffect>("hurt");
+            collectableGotten = Content.Load<SoundEffect>("powerup");
+            menuPress = Content.Load<SoundEffect>("button");
+            playerShot = Content.Load<SoundEffect>("shot");
+            bulletHit = Content.Load<SoundEffect>("hit");
 
             //player and enemy sprites
             player.Texture = Content.Load<Texture2D>("PlayerSprite1");
@@ -269,7 +283,7 @@ namespace Game1
             menuCreditsTexture = Content.Load<Texture2D>("CREDITS");
             menuQuitTexture = Content.Load<Texture2D>("QUIT");
             //level select
-            levelSelectTexture = Content.Load<Texture2D>("level selec bright version");
+            levelSelectTexture = Content.Load<Texture2D>("levleSelectFinal");
             level1Texture = Content.Load<Texture2D>("SONG 1");
             level2Texture = Content.Load<Texture2D>("SONG 2");
             level3Texture = Content.Load<Texture2D>("SONG 3");
@@ -378,14 +392,17 @@ namespace Game1
             
             if(menuStart.checkPressed(mouse) && menuStart.checkPressed(prevMouseState) == false)//when user hits play
             {
+                menuPress.Play();
                 gameState = GameState.LevelSelect;
             }
             if (menuCredits.checkPressed(mouse) && menuCredits.checkPressed(prevMouseState) == false)//when user hits credits
             {
+                menuPress.Play();
                 gameState = GameState.Credits;
             }
             if (menuQuit.checkPressed(mouse) && menuQuit.checkPressed(prevMouseState) == false)//when user hits quit
             {
+                menuPress.Play();
                 Exit();
             }
         }
@@ -394,11 +411,13 @@ namespace Game1
             //currently only level one has any data, so trying to play any of the others will crash the program
             if (level1Button.checkPressed(mouse) && level1Button.checkPressed(prevMouseState) == false)
             {
+                menuPress.Play();
                 currentLevel = level1;
                 reader = new FileReader(level1);
                 reader.ReadLine();
                 music = Content.Load<Song>("Level1");
                 MediaPlayer.Play(music);
+                bpm = 110;
                 l1 = true;
                 l2 = false;
                 l3 = false;
@@ -407,9 +426,13 @@ namespace Game1
             }
             else if (level2Button.checkPressed(mouse) && level2Button.checkPressed(prevMouseState) == false)
             {
+                menuPress.Play();
                 currentLevel = level2;
                 reader = new FileReader(level2);
                 reader.ReadLine();
+                music = Content.Load<Song>("Level2");
+                MediaPlayer.Play(music);
+                bpm = 100;
                 l1 = false;
                 l2 = true;
                 l3 = false;
@@ -418,6 +441,7 @@ namespace Game1
             }
             else if (level3Button.checkPressed(mouse) && level3Button.checkPressed(prevMouseState) == false)
             {
+                menuPress.Play();
                 currentLevel = level3;
                 reader = new FileReader(level3);
                 reader.ReadLine();
@@ -429,6 +453,7 @@ namespace Game1
             }
             else if (level4Button.checkPressed(mouse) && level4Button.checkPressed(prevMouseState) == false)
             {
+                menuPress.Play();
                 currentLevel = level4;
                 reader = new FileReader(level4);
                 reader.ReadLine();
@@ -440,6 +465,7 @@ namespace Game1
             }
             else if (back.checkPressed(mouse))
             {
+                menuPress.Play();
                 gameState = GameState.MainMenu;
             }
         }
@@ -447,11 +473,13 @@ namespace Game1
         {
             if(pauseMenuButton.checkPressed(mouse)&& pauseMenuButton.checkPressed(prevMouseState) == false)
             {
+                menuPress.Play();
                 ResetLevel();
                 gameState = GameState.MainMenu;
             }
             else if (pauseQuitButton.checkPressed(mouse))
             {
+                menuPress.Play();
                 Exit();
             }
         }
@@ -459,6 +487,7 @@ namespace Game1
         {
             if (back.checkPressed( mouse))
             {
+                menuPress.Play();
                 gameState = GameState.MainMenu;
             }
         }
@@ -466,6 +495,7 @@ namespace Game1
         {
             if (returnToMenuButton.checkPressed(mouse) && returnToMenuButton.checkPressed(prevMouseState) == false)
             {
+                menuPress.Play();
                 ResetLevel();
                 
                 gameState = GameState.MainMenu;
@@ -473,6 +503,7 @@ namespace Game1
             }
             else if (retryButton.checkPressed(mouse) && retryButton.checkPressed(prevMouseState) == false)
             {
+                menuPress.Play();
                 ResetLevel();
                 MediaPlayer.Play(music);
                 reader = new FileReader(currentLevel);
@@ -484,6 +515,7 @@ namespace Game1
         {
             if (levelCompleteButton.checkPressed(mouse) && levelCompleteButton.checkPressed(prevMouseState))
             {
+                menuPress.Play();
                 gameState = GameState.MainMenu;
                 ResetLevel();
             }
@@ -497,7 +529,7 @@ namespace Game1
 
             if ((mouse.LeftButton == ButtonState.Pressed) && (prevMouseState.LeftButton == ButtonState.Released))//checks if player pressed space and fires a bullet
             {
-
+                playerShot.Play();
                 //bonusScore -= 10;//decreases score as penalty for shooting
                 if (spread == true && spreadTimer > timer)
                 {
@@ -521,6 +553,7 @@ namespace Game1
                     p.Texture = pProjectileTexture;
                     p.Angle = (float)angle;
                     pProjects.Add(p);
+                    Console.WriteLine("SHOT FIRED");
                 }
                 else
                 {
@@ -555,12 +588,13 @@ namespace Game1
                     enemies.RemoveAt(i);
                     i--;
                 }
-                else if (enemies[i].SpawnTimer <= timer && enemies[i].AttackName == "homing")
-                {
-                    enemies.RemoveAt(i);
-                    i--;
-                    Console.WriteLine("REMOVED HOMING SHOT");
-                }
+                //else if (enemies[i].SpawnTimer <= timer && enemies[i].AttackName == "homing")
+                //{
+                //    enemies.RemoveAt(i);
+                //    i--;
+                //    Console.WriteLine("REMOVED HOMING SHOT");
+                //}
+                //   --changed behaviour to stop homing and fly straight after time limit
             }
             //removes and damages player when enemy collides with it
             for (int i = 0; i <= enemies.Count - 1; i++)
@@ -607,7 +641,7 @@ namespace Game1
 
             foreach(EnemyBullet en in enemies)
             {
-                if(en.AttackName == "homing")
+                if(en.AttackName == "homing" && en.SpawnTimer >= timer)
                 {
                     en.Angle = (en.FindAngle(en, player));
                 }
@@ -620,6 +654,9 @@ namespace Game1
                 {
                     if (p.CheckCollision(p, enemies[i]))
                     {
+                        bulletHit.Play();
+                        destroyedEnemies.Add(new DestroyedBullet(enemies[i].Position, enemyExplosionTexture));
+                        destroyedEnemies[destroyedEnemies.Count - 1].AppearTimer =  this.timer + 1.05f;
                         enemies.RemoveAt(i);
                         i--;
                         
@@ -719,6 +756,7 @@ namespace Game1
             {
                 if (powerUps[i].Position.Intersects(player.Position))
                 {
+                    collectableGotten.Play();
                     if (powerUps[i].Type == "shield")
                     {
                         shield = true;
@@ -773,7 +811,7 @@ namespace Game1
 
             //testing filereader
 
-            if (timer >= reader.TimeStamp && reader.LevelComplete == false)
+            if (timer >= (float)reader.TimeStamp * (float)(60.0 / bpm) && reader.LevelComplete == false)
             {
                 Console.WriteLine(reader.TimeStamp + " " + reader.AttackName
                     + " " + reader.NumberOfAttacks + " " + reader.xPosition + " " + reader.yPosition);
@@ -792,15 +830,115 @@ namespace Game1
                         enemies.Add(bullet);
                     }
                 }
-                else if (reader.AttackName == " homing")//spawns homing bullets
+                if (reader.AttackName == " random")//spawns basic enemy bullet randomly
+                {
+                    int dist = rng.Next(-20,820);
+                    int side = rng.Next(1,4);
+                    switch (side) {
+                        case 1:
+                            reader.xPosition = dist;
+                            reader.yPosition = -20;
+                            break;
+                        case 2:
+                            reader.xPosition = dist;
+                            reader.yPosition = 820;
+                            break;
+                        case 3:
+                            reader.xPosition = -20;
+                            reader.yPosition = dist;
+                            break;
+                        case 4:
+                            reader.xPosition = 820;
+                            reader.yPosition = dist;
+                            break;
+                    }
+                    for(int i = 0; i < reader.NumberOfAttacks; i++)
+                    {
+                        EnemyBullet bullet = new EnemyBullet((int)reader.xPosition, (int)reader.yPosition, 25, 25, 6);
+                        Console.WriteLine("Bullet created at: " + bullet.PositionX + ", " + bullet.PositionY);
+                        Console.WriteLine("Current reader time: " + reader.TimeStamp + ". Current Game time: " + timer);
+                        reader.xPosition += rng.Next(-30, 30);//spaces bullets out
+                        reader.yPosition += rng.Next(-30, 30);
+                        bullet.Texture = enemyTexture;
+                        bullet.Angle = bullet.FindAngle(bullet, player) + (float)((rng.NextDouble()-.5)*.25);
+                        bullet.AttackName = "basic";
+                        enemies.Add(bullet);
+                    }
+                }
+                else if (reader.AttackName == " line")//spawns a line of bullets
+                {
+                    float dir;
+                    int offsetY;
+                    int offsetX;
+                    if (reader.yPosition < 0) {
+                        dir = (float)Math.PI * 1 / 2; //down
+                        offsetX = -40;
+                        offsetY = 0;
+                    } else if (reader.xPosition < 0) {
+                        dir = 0; //right
+                        offsetX = 0;
+                        offsetY = 40;
+                    } else if (reader.yPosition > 800) {
+                        dir = (float)Math.PI * 3 / 2; //up
+                        offsetX = 40;
+                        offsetY = 0;
+                    } else {
+                        dir = (float)Math.PI; //left
+                        offsetX = 0;
+                        offsetY = -40;
+                    }
+                    for(int i = 0; i < reader.NumberOfAttacks; i++)
+                    {
+                        EnemyBullet bullet = new EnemyBullet((int)reader.xPosition, (int)reader.yPosition, 25, 25, 6);
+                        Console.WriteLine("Bullet created at: " + bullet.PositionX + ", " + bullet.PositionY);
+                        Console.WriteLine("Current reader time: " + reader.TimeStamp + ". Current Game time: " + timer);
+                        reader.xPosition += offsetX;//spaces bullets out
+                        reader.yPosition += offsetY;
+                        bullet.Angle = dir;
+                        bullet.Texture = enemyTexture;
+                        bullet.AttackName = "basic";
+                        enemies.Add(bullet);
+                    }
+                }
+                else if (reader.AttackName == " homing")//spawns homing bullet
                 {
                     EnemyBullet Hbullet = new EnemyBullet((int)reader.xPosition, (int)reader.yPosition, 25, 25, 4);
                     Console.WriteLine("Bullet created at: " + Hbullet.PositionX + ", " + Hbullet.PositionY);
                     Console.WriteLine("Current reader time: " + reader.TimeStamp + ". Current Game time: " + timer);
                     Hbullet.SpawnTimer = timer + 4;//sets time limit for how long the homing bullets will last
                     Console.WriteLine("Current timer is: " + timer + " homing bullet should despawn at" + Hbullet.SpawnTimer);
-                    reader.xPosition += rng.Next(25, 100);//spaces bullets out
-                    reader.yPosition += rng.Next(25, 100);
+                    Hbullet.Texture = homingEnemyTexture;
+                    Hbullet.Angle = Hbullet.FindAngle(Hbullet, player);
+                    Hbullet.AttackName = "homing";
+                    enemies.Add(Hbullet);
+                }
+                else if (reader.AttackName == " randhoming")//spawns homing bullet
+                {
+                    int dist = rng.Next(-20,820);
+                    int side = rng.Next(1,4);
+                    switch (side) {
+                        case 1:
+                            reader.xPosition = dist;
+                            reader.yPosition = -20;
+                            break;
+                        case 2:
+                            reader.xPosition = dist;
+                            reader.yPosition = 820;
+                            break;
+                        case 3:
+                            reader.xPosition = -20;
+                            reader.yPosition = dist;
+                            break;
+                        case 4:
+                            reader.xPosition = 820;
+                            reader.yPosition = dist;
+                            break;
+                    }
+                    EnemyBullet Hbullet = new EnemyBullet((int)reader.xPosition, (int)reader.yPosition, 25, 25, 4);
+                    Console.WriteLine("Bullet created at: " + Hbullet.PositionX + ", " + Hbullet.PositionY);
+                    Console.WriteLine("Current reader time: " + reader.TimeStamp + ". Current Game time: " + timer);
+                    Hbullet.SpawnTimer = timer + 4;//sets time limit for how long the homing bullets will last
+                    Console.WriteLine("Current timer is: " + timer + " homing bullet should despawn at" + Hbullet.SpawnTimer);
                     Hbullet.Texture = homingEnemyTexture;
                     Hbullet.Angle = Hbullet.FindAngle(Hbullet, player);
                     Hbullet.AttackName = "homing";
@@ -958,12 +1096,7 @@ namespace Game1
         protected void DrawCredits(GameTime gameTime)
         {
             //draws credits to the screen
-            spriteBatch.DrawString(spriteFont, "Quinn: Architecture and Menus", new Vector2(50, 50), Color.Black);
-            spriteBatch.DrawString(spriteFont, "Drew: Design and Collectables", new Vector2(50, 200), Color.Black);
-            spriteBatch.DrawString(spriteFont, "Gabriel: Production and in game art", new Vector2(50, 350), Color.Black);
-            spriteBatch.DrawString(spriteFont, "Level 1 song: 'Iguana' by Qusic", new Vector2(50, 500), Color.Black);
-            spriteBatch.DrawString(spriteFont, "Fisher: Concept", new Vector2(50, 650), Color.Black);
-            GraphicsDevice.Clear(Color.Snow);
+            spriteBatch.Draw(creditsTexture, new Rectangle(0, 0, 800, 800), Color.White);
             spriteBatch.Draw(backTexture, back.rectangle, Color.White);
         }
         protected void DrawGameOver(GameTime gameTime)
@@ -1037,6 +1170,13 @@ namespace Game1
                     (float)(en.Angle + Math.PI), new Vector2(en.Width/2, en.Height/2),
                     SpriteEffects.None, 0);
             }
+            foreach(DestroyedBullet b in destroyedEnemies)
+            {
+                if (b.AppearTimer > timer)
+                {
+                    spriteBatch.Draw(b.Texture, b.Rectangle, Color.White);
+                }
+            }
             foreach (PlayerProjectile p in pProjects)
             {
                 spriteBatch.Draw(p.Texture, p.Position, null, Color.White,
@@ -1091,6 +1231,10 @@ namespace Game1
             hurtTimer = 0;
             shotTimer = 0;
             player.Texture = character;
+            while(destroyedEnemies.Count > 0)
+            {
+                destroyedEnemies.RemoveAt(0);
+            }
             while (enemies.Count > 0)//deletes enemy projectiles
             {
                 enemies.RemoveAt(0);
@@ -1107,60 +1251,12 @@ namespace Game1
             {
                 pProjects.RemoveAt(0);
             }
-            while (powerUps.Count > 0)//deletes player projectiles
-            {
-                powerUps.RemoveAt(0);
-            }
+            
             ResetElapsedTime();
             
         }
         
-        //bullet spawner
-        /*
-        public void BulletSpawner()
-        {
-            if(enemies.Count < 10)
-            {
-                //determine area to spawn in
-                spawnDirection = rng.Next(1, 5);
-                
-                if(spawnDirection == 1)//spawns above the screen
-                {
-                    int randomX = rng.Next(10, GraphicsDevice.Viewport.Width);  //spawns above
-                    EnemyBullet enemy = new EnemyBullet(randomX, -100, 20, 20, 6.0f);
-                    enemy.Texture = enemyTexture;
-                    enemy.Angle = enemy.FindAngle(enemy, player);
-                    enemies.Add(enemy);
-                }
-                if(spawnDirection == 2)//spawns to the right of the screen
-                {
-                    int randomY = rng.Next(10, GraphicsDevice.Viewport.Height);//spawns to the right
-                    EnemyBullet enemy = new EnemyBullet(GraphicsDevice.Viewport.Width +100, randomY, 20, 20, 6.0f);
-                    enemy.Texture = enemyTexture;
-                    enemy.Angle = enemy.FindAngle(enemy, player);
-                    enemies.Add(enemy);
-                }
-                if(spawnDirection == 3)//spawns below the screen
-                {
-                    int randomX = rng.Next(10, GraphicsDevice.Viewport.Width);//spawns below
-                    EnemyBullet enemy = new EnemyBullet(randomX, GraphicsDevice.Viewport.Height + 100, 20, 20, 6.0f);
-                    enemy.Texture = enemyTexture;
-                    enemy.Angle = enemy.FindAngle(enemy, player);
-                    enemies.Add(enemy);
-                }
-                if(spawnDirection == 4)//spawns to the left of the screen
-                {
-                    int randomY = rng.Next(10, GraphicsDevice.Viewport.Height);//spawns to the left
-                    EnemyBullet enemy = new EnemyBullet(-100, randomY, 20, 20, 6.0f);
-                    enemy.Texture = enemyTexture;
-                    enemy.Angle = enemy.FindAngle(enemy, player);
-                    enemies.Add(enemy);
-                }
-                
-            }
-       
-         }
-         */
+        
         
     }
 }
