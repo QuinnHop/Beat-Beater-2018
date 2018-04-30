@@ -866,8 +866,7 @@ namespace Game1
                     }
                     if (player.Health <= 0) //Ends current game if player health is equal to or below 0
                     {
-                        gameState = GameState.GameOver;
-                        
+                        gameState = GameState.GameOver; 
                     }
                     break;
                 case GameState.LevelComplete:
