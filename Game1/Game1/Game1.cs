@@ -159,6 +159,9 @@ namespace Game1
         //sounds
         SoundEffect playerHit;
         SoundEffect collectableGotten;
+        SoundEffect playerShot;
+        SoundEffect menuPress;
+        SoundEffect bulletHit;
 
         Song music;
 
@@ -247,7 +250,11 @@ namespace Game1
             spriteFont = Content.Load<SpriteFont>("FontFile");
             finalScoreSpriteFont = Content.Load<SpriteFont>("FinalScoreFont");
             //sounds
-            playerHit = Content.Load<SoundEffect>("Crash");
+            playerHit = Content.Load<SoundEffect>("hurt");
+            collectableGotten = Content.Load<SoundEffect>("powerup");
+            menuPress = Content.Load<SoundEffect>("button");
+            playerShot = Content.Load<SoundEffect>("shot");
+            bulletHit = Content.Load<SoundEffect>("hit");
 
             //player and enemy sprites
             player.Texture = Content.Load<Texture2D>("PlayerSprite1");
@@ -381,14 +388,17 @@ namespace Game1
             
             if(menuStart.checkPressed(mouse) && menuStart.checkPressed(prevMouseState) == false)//when user hits play
             {
+                menuPress.Play();
                 gameState = GameState.LevelSelect;
             }
             if (menuCredits.checkPressed(mouse) && menuCredits.checkPressed(prevMouseState) == false)//when user hits credits
             {
+                menuPress.Play();
                 gameState = GameState.Credits;
             }
             if (menuQuit.checkPressed(mouse) && menuQuit.checkPressed(prevMouseState) == false)//when user hits quit
             {
+                menuPress.Play();
                 Exit();
             }
         }
@@ -397,6 +407,7 @@ namespace Game1
             //currently only level one has any data, so trying to play any of the others will crash the program
             if (level1Button.checkPressed(mouse) && level1Button.checkPressed(prevMouseState) == false)
             {
+                menuPress.Play();
                 currentLevel = level1;
                 reader = new FileReader(level1);
                 reader.ReadLine();
@@ -410,6 +421,7 @@ namespace Game1
             }
             else if (level2Button.checkPressed(mouse) && level2Button.checkPressed(prevMouseState) == false)
             {
+                menuPress.Play();
                 currentLevel = level2;
                 reader = new FileReader(level2);
                 reader.ReadLine();
@@ -421,6 +433,7 @@ namespace Game1
             }
             else if (level3Button.checkPressed(mouse) && level3Button.checkPressed(prevMouseState) == false)
             {
+                menuPress.Play();
                 currentLevel = level3;
                 reader = new FileReader(level3);
                 reader.ReadLine();
@@ -432,6 +445,7 @@ namespace Game1
             }
             else if (level4Button.checkPressed(mouse) && level4Button.checkPressed(prevMouseState) == false)
             {
+                menuPress.Play();
                 currentLevel = level4;
                 reader = new FileReader(level4);
                 reader.ReadLine();
@@ -443,6 +457,7 @@ namespace Game1
             }
             else if (back.checkPressed(mouse))
             {
+                menuPress.Play();
                 gameState = GameState.MainMenu;
             }
         }
@@ -450,11 +465,13 @@ namespace Game1
         {
             if(pauseMenuButton.checkPressed(mouse)&& pauseMenuButton.checkPressed(prevMouseState) == false)
             {
+                menuPress.Play();
                 ResetLevel();
                 gameState = GameState.MainMenu;
             }
             else if (pauseQuitButton.checkPressed(mouse))
             {
+                menuPress.Play();
                 Exit();
             }
         }
@@ -462,6 +479,7 @@ namespace Game1
         {
             if (back.checkPressed( mouse))
             {
+                menuPress.Play();
                 gameState = GameState.MainMenu;
             }
         }
@@ -469,6 +487,7 @@ namespace Game1
         {
             if (returnToMenuButton.checkPressed(mouse) && returnToMenuButton.checkPressed(prevMouseState) == false)
             {
+                menuPress.Play();
                 ResetLevel();
                 
                 gameState = GameState.MainMenu;
@@ -476,6 +495,7 @@ namespace Game1
             }
             else if (retryButton.checkPressed(mouse) && retryButton.checkPressed(prevMouseState) == false)
             {
+                menuPress.Play();
                 ResetLevel();
                 MediaPlayer.Play(music);
                 reader = new FileReader(currentLevel);
@@ -487,6 +507,7 @@ namespace Game1
         {
             if (levelCompleteButton.checkPressed(mouse) && levelCompleteButton.checkPressed(prevMouseState))
             {
+                menuPress.Play();
                 gameState = GameState.MainMenu;
                 ResetLevel();
             }
@@ -500,7 +521,7 @@ namespace Game1
 
             if ((mouse.LeftButton == ButtonState.Pressed) && (prevMouseState.LeftButton == ButtonState.Released))//checks if player pressed space and fires a bullet
             {
-
+                playerShot.Play();
                 //bonusScore -= 10;//decreases score as penalty for shooting
                 if (spread == true && spreadTimer > timer)
                 {
@@ -524,6 +545,7 @@ namespace Game1
                     p.Texture = pProjectileTexture;
                     p.Angle = (float)angle;
                     pProjects.Add(p);
+                    Console.WriteLine("SHOT FIRED");
                 }
                 else
                 {
@@ -623,6 +645,7 @@ namespace Game1
                 {
                     if (p.CheckCollision(p, enemies[i]))
                     {
+                        bulletHit.Play();
                         destroyedEnemies.Add(new DestroyedBullet(enemies[i].Position, enemyExplosionTexture));
                         destroyedEnemies[destroyedEnemies.Count - 1].AppearTimer =  this.timer + 1.05f;
                         enemies.RemoveAt(i);
@@ -724,6 +747,7 @@ namespace Game1
             {
                 if (powerUps[i].Position.Intersects(player.Position))
                 {
+                    collectableGotten.Play();
                     if (powerUps[i].Type == "shield")
                     {
                         shield = true;
